@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
+import { parseWakeupMessage } from '@librechat/chat';
 import type { TMessageProps } from '~/common';
 import SearchContent, {
   rendersMarkdownLite,
 } from '~/components/Chat/Messages/Content/SearchContent';
-import { parseWakeupMessage } from '~/components/Chat/Messages/Content/Parts/wakeup';
 import AuthorHeader from '~/components/Chat/Messages/Content/Parts/AuthorHeader';
 import MinimalHoverButtons from '~/components/Chat/Messages/MinimalHoverButtons';
 import { getHeaderHoverLabel } from '~/components/Chat/Messages/ui/HeaderLabel';

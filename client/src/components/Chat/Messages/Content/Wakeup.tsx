@@ -1,6 +1,6 @@
 import { memo, useCallback, useMemo, useState } from 'react';
 import { Button } from '@librechat/client';
-import type { WakeupDisplay, WakeupTask } from './Parts/wakeup';
+import type { WakeupDisplay, WakeupTask } from '@librechat/chat';
 import type { TranslationKeys } from '~/hooks';
 import SystemEventHeader, {
   SystemEventIcon,
