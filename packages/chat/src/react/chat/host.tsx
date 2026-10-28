@@ -5,6 +5,7 @@ import type {
   TAttachment,
   TConversation,
   TPendingSteer,
+  TAgentQueuedTurnReceipt,
   UIMappingOptions,
 } from 'librechat-data-provider';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
@@ -72,6 +73,14 @@ export type ChatMessageCache = {
   refetchActiveJobs: () => void;
   /** Marks a conversation's stream status stale. */
   refetchStreamStatus: (conversationId: string) => void;
+  /** Marks a conversation's messages stale; only mounted readers refetch. */
+  invalidateMessages: (conversationId: string) => void;
+  /** When a conversation's messages were last fetched, if they ever were. */
+  messagesUpdatedAt: (conversationId: string) => number | undefined;
+  /** Refetches a conversation's messages; rejects when the fetch fails. */
+  reloadMessages: (conversationId: string) => Promise<void>;
+  /** The server's queued-turn receipts last read for a conversation. */
+  readQueuedTurns: (conversationId: string) => TAgentQueuedTurnReceipt[] | undefined;
 };
 
 /**
