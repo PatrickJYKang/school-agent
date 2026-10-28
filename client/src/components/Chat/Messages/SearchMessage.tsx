@@ -1,8 +1,8 @@
 import { memo, useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
+import { AuthorHeader } from '@librechat/chat/components';
 import type { TMessage } from 'librechat-data-provider';
 import type { TMessageProps, TMessageIcon } from '~/common';
-import AuthorHeader from '~/components/Chat/Messages/Content/Parts/AuthorHeader';
 import MinimalHoverButtons from '~/components/Chat/Messages/MinimalHoverButtons';
 import { getHeaderModelName } from '~/components/Chat/Messages/ui/HeaderLabel';
 import { getMessageRowWidthClass } from '~/components/Chat/Messages/ui/width';

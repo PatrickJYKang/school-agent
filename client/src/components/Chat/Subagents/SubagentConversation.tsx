@@ -9,8 +9,8 @@ import {
   CollapsibleTrigger,
 } from '@librechat/client';
 import type { TMessage, TMessageContentParts } from 'librechat-data-provider';
+import type { ToolContentQuery } from '@librechat/chat/react';
 import type { ReactNode } from 'react';
-import type { ToolContentQuery } from '~/components/Chat/Messages/Content/disclosure';
 import type { TaskContentScope } from '~/data-provider/Subagents/content';
 import type { MessagePartsHost } from '~/hooks/Chat/contract';
 import type { ChildConversationTurn } from './adapters';

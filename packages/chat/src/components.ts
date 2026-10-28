@@ -33,3 +33,19 @@ export type { ComposerSubmitRoute } from './components/composer/submit';
 export type { MentionItemProps } from './components/composer/MentionItem';
 export type { ChipProps as ComposerChipProps } from './components/composer/bar/Chip';
 export type { SteerReceiptState } from './components/composer/steering/Receipt';
+
+/** Parts: the leaf components and row classes tool cards share. */
+export { default as Stdout } from './components/parts/Stdout';
+export { default as BareStatus } from './components/parts/BareStatus';
+export { default as AuthorHeader } from './components/parts/AuthorHeader';
+export { default as CancelledIcon } from './components/parts/CancelledIcon';
+export { default as InProgressCall } from './components/parts/InProgressCall';
+export {
+  ROW_GLYPH_SLOT,
+  PANE_COPY_REVEAL,
+  FOLD_GLYPH_CLASS,
+  TOOL_ROW_CLASSES,
+  FOLD_RAIL_CLASSES,
+  FOLD_GLYPH_SELECTOR,
+  ARTIFACT_ROW_NAV_SPACING,
+} from './components/parts/rows';
