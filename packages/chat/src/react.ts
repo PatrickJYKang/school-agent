@@ -114,3 +114,5 @@ export type { ReactQueryChatStateOptions } from './react/state';
 export { composerLiftFamily } from './react/lift';
 export { showSkillsPopoverFamily } from './react/skills';
 export { useComposerOverlay, composerOverlayCountFamily } from './react/overlay';
+export { useFilesHost, FilesHostProvider } from './react/files';
+export type { FilesHost } from './react/files';
