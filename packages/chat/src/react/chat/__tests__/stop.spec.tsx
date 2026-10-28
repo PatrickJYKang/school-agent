@@ -33,7 +33,6 @@ jest.mock('../../steering/useSteerConvert', () => ({
 }));
 
 const noop = () => undefined;
-const noLiveAttachments = {};
 const turns = { ask: jest.fn(), regenerate: jest.fn() };
 const cache: ChatMessageCache = {
   read: () => undefined,
@@ -55,7 +54,6 @@ const createHost = (conversation: TConversation | null): ChatHost => ({
   useSetSiblingIdx: () => noop,
   useAbortStream: () => mockAbortStream,
   useMessageCache: () => cache,
-  useLiveAttachments: () => noLiveAttachments,
   useFeedbackEnabled: () => false,
   getMappingOptions: () => ({}),
 });
