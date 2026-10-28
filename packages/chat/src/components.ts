@@ -47,3 +47,15 @@ export type { SubtitleAction } from './components/composer/files/FileContainer';
 export type { PastedTextEdit } from './components/composer/files/PastedTextDialog';
 export { default as AttachmentImage } from './components/composer/files/Image';
 export { default as ImagePreview } from './components/composer/files/ImagePreview';
+export { default as SendButton } from './components/composer/SendButton';
+export { default as QuoteButton } from './components/composer/QuoteButton';
+export { default as ComposerHints } from './components/composer/bar/Hints';
+export { default as ComposerWaveform } from './components/composer/bar/Waveform';
+export { default as EscalateNowButton } from './components/composer/EscalateNowButton';
+export { default as DuringRunSendButton } from './components/composer/DuringRunSendButton';
+export { composerHintId } from './components/composer/bar/Hints';
+export type {
+  ComposerHint,
+  ComposerHintKind,
+  ComposerHintState,
+} from './components/composer/bar/hint';

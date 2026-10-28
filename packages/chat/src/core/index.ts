@@ -15,3 +15,5 @@ export * from './transport';
 export * from './usage';
 export * from './regenerate';
 export * from './content';
+export * from './shortcuts';
+export * from './pane';

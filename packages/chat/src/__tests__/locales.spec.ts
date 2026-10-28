@@ -26,6 +26,8 @@ describe('@librechat/chat localization keys', () => {
       ),
     );
     expect(used.size).toBeGreaterThan(0);
-    expect([...used].filter((key) => !(key in translations))).toEqual([]);
+    /** A key localized with a `count` resolves through i18next's plural suffixes. */
+    const defined = (key: string) => key in translations || `${key}_other` in translations;
+    expect([...used].filter((key) => !defined(key))).toEqual([]);
   });
 });
