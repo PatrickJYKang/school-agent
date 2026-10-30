@@ -5,6 +5,7 @@ import {
   EToolResources,
   ToolCallTypes,
   PermissionTypes,
+  SCHOOL_WEB_TOOL_NAME,
 } from 'librechat-data-provider';
 import type { Request as ServerRequest } from 'express';
 import type { CheckAccessParams } from '../middleware/access';
@@ -19,6 +20,7 @@ export const toolRolePermissions: Partial<Record<string, PermissionTypes>> = {
   [Tools.file_search]: PermissionTypes.FILE_SEARCH,
   [Tools.execute_code]: PermissionTypes.RUN_CODE,
   [Tools.web_search]: PermissionTypes.WEB_SEARCH,
+  [SCHOOL_WEB_TOOL_NAME]: PermissionTypes.WEB_SEARCH,
 };
 
 /**

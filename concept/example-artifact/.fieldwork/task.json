@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "illustrative": true,
+  "task_id": "sample-creek",
+  "name": "Creek health investigation",
+  "location": {
+    "provider": "onedrive_sharepoint",
+    "path": "Westview / Fieldwork / creek-investigation",
+    "institution_managed": true
+  },
+  "sharing_scope": "task_folder",
+  "access_authority": "native_provider_permissions",
+  "contains": ["documents", "assets", "comments", "revisions"],
+  "private_context_included": false
+}

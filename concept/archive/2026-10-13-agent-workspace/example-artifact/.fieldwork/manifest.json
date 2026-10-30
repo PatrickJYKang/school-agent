@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "illustrative": true,
+  "document_id": "sample-creek-report",
+  "content": "report.md",
+  "format": "text/markdown",
+  "assets": ["assets/nitrate.svg"],
+  "comments": ".fieldwork/comments.json",
+  "revisions": ".fieldwork/revisions.json",
+  "task": ".fieldwork/task.json"
+}

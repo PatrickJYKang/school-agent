@@ -1,0 +1,318 @@
+{
+  "working_title": "Fieldwork",
+  "date": "2026-10-12",
+  "status": "Product concept and local interactive mockup; no model or external accounts connected.",
+  "deliverables": {
+    "pitch": "index.html",
+    "interactive_mockup": "mockup.html",
+    "reference_log": "design-notes.json",
+    "format_example": "example-artifact/report.md",
+    "format_example_bundle": "example-artifact.zip"
+  },
+  "user_constraints": [
+    "School-sponsored work group for high school students and educators.",
+    "Institution distributes, pays for, and controls the AI environment.",
+    "Open-source distribution.",
+    "Emphasize features and UX over implementation choices.",
+    "Capable agent and tool use comparable in vision to a desktop agent workspace.",
+    "Keep the scope mostly to AI capabilities; do not replace Canvas, messaging, email, or authoritative storage.",
+    "Include artifact collaboration.",
+    "Support OneDrive/SharePoint and GitHub.",
+    "Read selected authorized context from Canvas, Slack, Outlook, and other institution-approved systems.",
+    "Institution-controlled permissions with sensible defaults.",
+    "Default document content is plain Markdown; no proprietary rich document format.",
+    "Comments and history are separate JSON/git-like metadata.",
+    "DOCX and PDF remain read-only sources. Editing requests create a Markdown working copy.",
+    "Graphics are separate image assets linked from Markdown. Interactive visuals remain in chat.",
+    "Do not make a collaborative document editor the focus. Do not build a live Word editor.",
+    "Repopulation of Word with revised text is a later, explicit capability.",
+    "Do not explicitly tie working documents to originals; useful source associations stay in agent context.",
+    "Each new task creates a folder; share the folder with permissions.",
+    "Prefer institution-controlled OneDrive cloud folders; support GitHub and a secondary local option.",
+    "Show multiple people and their own agents working in the same folder. Keep working copies and integration behind the scenes; focus the UI on agent work."
+  ],
+  "provenance_rule": "All delivered HTML, CSS, JavaScript, branding, copy, and sample data are original work for this brief. References inform product patterns; no source code, visual assets, or product screenshots were copied.",
+  "design_decisions": [
+    {
+      "feature": "Institution-operated AI access",
+      "reference": "Peninsula School District AI Studio",
+      "url": "https://psd401.ai/software/ai-studio",
+      "source_pattern": "District authentication, multi-model access, tool permissions, and institutional operation.",
+      "our_choice": "Show a school-provided workspace with an AI-only institution policy view. Keep student and educator tasks inside the same product.",
+      "status": "Reference-inspired; original presentation and interaction."
+    },
+    {
+      "feature": "Versioned, agent-editable artifacts",
+      "reference": "Peninsula School District Atrium",
+      "url": "https://psd401.ai/software/atrium",
+      "source_pattern": "Documents and interactive artifacts with visible authorship, versions, permissions, and agent-accessible operations.",
+      "our_choice": "Light Markdown drafts, comments, and revisions inside a shared task folder. Each participant keeps a separate agent conversation. No formal original-to-draft relationship.",
+      "status": "Reference-inspired; collaboration and sharing UX designed for this brief."
+    },
+    {
+      "feature": "Chat beside working surfaces",
+      "reference": "Flint",
+      "url": "https://app.flintk12.com/help/articles/tools-available-when-chatting-with-sparky",
+      "source_pattern": "Documents, executed code, Python charts, and other outputs alongside school chat.",
+      "our_choice": "Task sidebar, conversation, and small draft pane. Draft, selected sources, and work record; interactive visuals stay in chat.",
+      "status": "Reference-inspired; original layout, visual identity, and component code."
+    },
+    {
+      "feature": "Educator-provided activity guidance",
+      "reference": "Playlab",
+      "url": "https://www.playlab.ai/",
+      "source_pattern": "Educators shape assistants and tools using their own materials.",
+      "our_choice": "Activity-specific guidance and a Coach/Partner/Delegate assistance choice. Avoid introducing a new course builder, assignment system, gradebook, or classroom-management dashboard.",
+      "status": "Reference-inspired; assistance mode taxonomy and restrained feature scope are proposed."
+    },
+    {
+      "feature": "Scoped capabilities and shared resources",
+      "reference": "LibreChat",
+      "url": "https://www.librechat.ai/docs/features/access_control",
+      "source_pattern": "Role/group feature permissions plus resource-specific sharing controls.",
+      "our_choice": "Institution policy intersects with the user's existing permissions. Read selected resources; separate read and external-write abilities. Do not expose technical permission internals to ordinary users.",
+      "status": "Reference-inspired; simplified policy UX designed for this brief."
+    },
+    {
+      "feature": "Meaningful action review",
+      "reference": "Goose",
+      "url": "https://goose-docs.ai/docs/guides/goose-permissions/",
+      "source_pattern": "Adjustable autonomy and granular tool approval.",
+      "our_choice": "Task-file edits happen inside an authorized working folder. Review permission changes, repository publication, sending, and writes outside the folder.",
+      "status": "Reference-inspired; destination and diff review flow is original."
+    },
+    {
+      "feature": "Visible progress and intervention",
+      "reference": "MagenticLite / Magentic-UI",
+      "url": "https://github.com/microsoft/magentic-ui",
+      "source_pattern": "Users can steer, approve, and take over agent work.",
+      "our_choice": "Readable tool activity with a Stop action. Record actions, evidence, and contributions rather than displaying private model reasoning.",
+      "status": "Reference-inspired; original multi-step task demonstration."
+    },
+    {
+      "feature": "Task folders as the collaboration boundary",
+      "reference": "User direction",
+      "source_pattern": "OneDrive/SharePoint and GitHub support explicitly requested.",
+      "our_choice": "OneDrive cloud folders by default, backed by a school-managed library and backend access management. GitHub task folders inherit repository permissions; use a dedicated private school repository for independent access. Local is an advanced option, with GitHub integration for sharing.",
+      "status": "Designed from scratch for the user's scope."
+    },
+    {
+      "feature": "External context selection",
+      "reference": "User direction",
+      "source_pattern": "Canvas, Slack, Outlook, and other services are connections rather than products to replace.",
+      "our_choice": "Task-scoped source pickers. Only bring in necessary assignments, channels, mail threads, libraries, and repositories. Never infer access from an AI instruction.",
+      "status": "Designed from scratch for the user's scope."
+    },
+    {
+      "feature": "Identity and visual direction",
+      "reference": "Original",
+      "our_choice": "Fieldwork is a working name, not a cleared brand. Warm paper, forest green, restrained terracotta, readable system typography, and serif document titles. Editorial pitch and compact work interface have distinct purposes.",
+      "status": "Original; no claim of trademark availability."
+    },
+    {
+      "feature": "Markdown working copies and separate chat visualizations",
+      "reference": "User direction plus official OpenAI visualization documentation",
+      "url": "https://learn.chatgpt.com/docs/visualizations",
+      "source_pattern": "Interactive visual explanations are explored inside a chat.",
+      "our_choice": "Preserve DOCX/PDF sources, use Markdown as document content, separate graphics and JSON metadata, and keep collaboration limited to draft review.",
+      "status": "User-directed product boundary; original UI and example schema."
+    },
+    {
+      "feature": "Native folder and repository sharing",
+      "reference": "Official Microsoft and GitHub documentation",
+      "urls": [
+        "https://learn.microsoft.com/en-us/graph/api/driveitem-invite?view=graph-rest-1.0",
+        "https://docs.github.com/en/organizations/managing-user-access-to-your-organizations-repositories/managing-repository-roles/repository-roles-for-an-organization"
+      ],
+      "source_pattern": "Microsoft drive items can grant read/write access. GitHub collaborator and team roles are repository-scoped.",
+      "our_choice": "Use Can view / Can edit for OneDrive; separately authorize management of access. No public link by default. GitHub UI displays repository-wide access, not fictitious per-folder permissions.",
+      "status": "Constraint checked against primary documentation; original interaction design."
+    },
+    {
+      "feature": "Parallel people and agents in a task folder",
+      "reference": "User-directed collaboration boundary; primary provider documentation for underlying write constraints",
+      "urls": [
+        "https://learn.microsoft.com/en-us/graph/api/driveitem-createuploadsession?view=graph-rest-1.0",
+        "https://docs.github.com/en/rest/git/refs"
+      ],
+      "our_choice": "Independent agent preparation, temporary per-file writer claims, refreshed updates, and queued overlapping work. Human decisions address incompatible intentions; ordinary users do not manage merge conflicts.",
+      "status": "Recommendation under discussion; not implemented or validated as production coordination."
+    },
+    {
+      "feature": "Isolated parallel agent work",
+      "reference": "T3 Code source review",
+      "url": "https://github.com/pingdotgg/t3code/blob/8ac4b97dae6bff7258fa5091a908116902fbd635/apps/server/src/orchestration-v2/ThreadLaunchService.ts#L451",
+      "source_pattern": "Explicit isolated worktrees plus an intentional shared-checkout mode; safeguards for restoring shared work.",
+      "our_choice": "One ordered shared version, with independent agent draft preparation. Prefer short publication coordination; optional isolated drafts for longer overlapping work. Keep Git and branch mechanics out of the ordinary student interface.",
+      "status": "Reference-informed refinement; production behavior and mockup remain unimplemented."
+    },
+    {
+      "feature": "Shared agent activity as the main work surface",
+      "reference": "User direction and reviewed T3 Code isolation patterns",
+      "our_choice": "Default to people’s agent tasks, progress, outputs, and decisions in a common folder. Keep each conversation separate. File preparation and integration happen behind the scenes. Files remain plain Markdown and assets.",
+      "status": "Original interactive mockup; scripted local simulation."
+    }
+  ],
+  "proposed_connection_defaults": {
+    "onedrive_sharepoint": {
+      "read": "Selected files and shared libraries, constrained by upstream access.",
+      "write": "Normal task-folder writes within delegated authority; review sharing and writes beyond the task folder. Institution-managed storage and management rights must be configured explicitly."
+    },
+    "github": {
+      "read": "Selected repositories, constrained by upstream access.",
+      "write": "Review changes before creating a branch or pull request. No direct merge in the pilot."
+    },
+    "canvas": {
+      "read": "Accessible assignments, rubrics, and course materials selected for the task.",
+      "write": "Submission and grading excluded from the pilot."
+    },
+    "slack": {
+      "read": "Selected authorized school channels.",
+      "write": "Disabled by default. If enabled by the institution, review and confirm before posting."
+    },
+    "outlook": {
+      "read": "Selected authorized school mail context.",
+      "write": "Disabled by default. If enabled by the institution, review and confirm before sending."
+    }
+  },
+  "mockup_implemented_locally": [
+    "Student, educator, and institution perspectives.",
+    "Editable interpretation, artifact comments, saved versions, and restoration.",
+    "Review and acceptance of a scripted AI suggestion.",
+    "Chart and means computed from the displayed sample CSV.",
+    "Local CSV attachment support: three columns, at most 100 rows, nonnegative numeric readings.",
+    "Downloadable Markdown report, CSV data, and action record.",
+    "Scripted multi-step agent run with interruption.",
+    "Assistance mode selection.",
+    "Institution capability, read/write, retention, and allowance controls.",
+    "Local browser storage and explicit reset.",
+    "Canonical Markdown draft with Preview/Markdown views.",
+    "Read-only extracted-text sample DOCX source and Open Markdown working copy action.",
+    "Inline chat chart with series toggles and explicit image insertion.",
+    "Markdown-only document download, separate graphic download, and JSON sidecar download.",
+    "Stored image snapshot remains separate from interactive chat data.",
+    "New tasks with OneDrive (default), GitHub, or local folder locations; task switching preserves separate state.",
+    "Folder file list, view/edit sharing review, and private chat/context explanation.",
+    "GitHub repository-scope sharing explanation, pull-request preview, and local-to-GitHub copy simulation.",
+    "Agent work is the default task view; files and selected sources are secondary.",
+    "Scripted concurrent Casey, Jordan, and Ms. Chen agent tasks with independent progress and outputs.",
+    "Stopping your own agent leaves other sample agents running.",
+    "Student and educator conversations stay separate while viewing the same shared folder.",
+    "Compatible report updates preserve both interpretation and limitations; educator feedback is a separate Markdown file.",
+    "Changed wording stays intact while a proposed result awaits a simple review."
+  ],
+  "mockup_not_implemented": [
+    "Live model inference, web search, or code sandbox.",
+    "Authentication or external connector access.",
+    "Real shared editing, presence, comments, or synchronization across users.",
+    "External file modification, messages, submissions, pull requests, or spending enforcement.",
+    "A production retention/deletion service.",
+    "Actual DOCX/PDF extraction or round-trip editing.",
+    "Full Markdown dialect parser: the prototype renders headings, paragraphs, lists, and its generated image.",
+    "Actual task-folder provisioning, institutional custody, native permission grants, or cloud synchronization.",
+    "Production private working copies, native Git worktree execution, or general-purpose merge/conflict handling. The demo applies a few known Markdown changes with base-content checks."
+  ],
+  "deferred_product_features": [
+    "Background tasks and recurring agent work after the initial interaction patterns are validated.",
+    "Live voice or screen context.",
+    "Additional artifact renderers and presentation export.",
+    "Advanced collaboration permissions and review workflows."
+  ],
+  "explicitly_out_of_scope": [
+    "An LMS, roster manager, gradebook, assignment submission system, or student-performance scoring dashboard.",
+    "A replacement for Slack, Teams, Outlook, calendars, or enterprise document management.",
+    "Automatic grading or grade changes.",
+    "Autonomous external publishing or message sending without a reviewed action.",
+    "Choosing an implementation foundation in this concept pitch.",
+    "Live Word editing, proprietary document components, page layout controls, and real-time collaborative text-editor infrastructure."
+  ],
+  "validation": {
+    "date": "2026-10-13",
+    "browser": "Codex in-app browser",
+    "checks": [
+      "Agent work is the default view and shows Casey, Jordan, and Ms. Chen directing their own agents in one folder.",
+      "Parallel playback advances three tasks independently; stopping Casey’s task leaves the other sample agents running.",
+      "Compatible updates retain both Casey’s interpretation and Jordan’s limitations in report.md.",
+      "Educator output is a separately inspectable Markdown feedback file.",
+      "Student and educator demo conversations and selected connection references remain separate in the same folder.",
+      "Changing the interpretation during a run retains that wording and produces an ordinary result review.",
+      "Keeping current wording completes the review without replacing the report.",
+      "390px mobile agent-work view has no horizontal overflow; desktop and mobile previews captured.",
+      "HTML scripts and JSON metadata parse; no captured browser warnings or errors."
+    ],
+    "limits": "Scripted browser-local activity with known Markdown edits and base-content checks. There are no live agents, shared server sessions, cloud writes, real working-copy isolation, or general-purpose merging. Browser conversations and permissions simulate separate people."
+  },
+  "artifact_format_decision": {
+    "canonical_document": "UTF-8 Markdown; a small portable subset, no custom component syntax or embedded presentation state.",
+    "format_scope": "Markdown is the default for prose documents. Code, data, and standalone interactive outputs retain appropriate native file formats.",
+    "graphics": "Separate image files referenced by relative Markdown paths. Version image assets together with document revisions.",
+    "chat_visuals": "Interactive charts and explanations rendered in chat. Explicitly capture an image to include in Markdown.",
+    "metadata": "Separate JSON comments and revision metadata. Keep older Markdown and assets as snapshots or Git blobs. No formal source-to-draft mappings.",
+    "comment_anchors": "A base revision plus quoted passage and surrounding context. If a match is ambiguous after edits, flag it for review instead of silently moving it.",
+    "source_flow": [
+      "Read a source in place when the request is read-only.",
+      "On an editing request, bring text into a Markdown draft in the task folder.",
+      "Edit and discuss Markdown. The agent can retain useful source context privately.",
+      "Save files and metadata in the task folder; share that folder with native access controls.",
+      "Optional Word write-back is deferred."
+    ],
+    "product_boundary": "Light draft review: plain editing, agent-proposed changes, comments, and snapshots. No page layout, rich word processing, or live coediting infrastructure."
+  },
+  "task_folder_decision": {
+    "unit": "One new working folder per task; sharing covers files, assets, comments, revision history, and explicitly shared task notes.",
+    "default": "Cloud OneDrive interface backed by an institution-managed SharePoint library, not dependent on a student account lifetime.",
+    "management": "Backend provisions and manages folders under administrator policy. File-edit rights and authority to manage native sharing are separate. A write-capable app is not automatically an institution-owned folder.",
+    "sharing_default": "Task creator plus institution management; selected authenticated people/groups get view or edit. No public link by default. Existing upstream inherited access must be displayed, not hidden.",
+    "github": "Task folder and working branch in school-owned private repository. Use a separate repository for independent sharing; an existing repository shares its access across every task folder. Review a pull request for repository publication.",
+    "local": "Secondary advanced location; encourage cloud. GitHub integration can make a repository copy. No local-folder sharing service.",
+    "personal_context": "Private conversations, agent context, and external source selections remain outside the shared folder by default. Shared notes are explicit files. Institution policy determines administrator access to sessions.",
+    "collaboration_boundary": "Files, comments, proposed changes, and revisions; no live Word editor, presence system, or document-suite expansion.",
+    "concurrent_work": {
+      "status": "Interaction demonstrated locally with scripted concurrent activity and simple guarded file updates. Production isolation and integration remain unimplemented.",
+      "principle": "People and agents work in parallel; changes to each existing shared file are coordinated through the harness.",
+      "independent_work": "Run research, calculations, and draft preparation separately. New outputs receive distinct paths; private scratch stays outside the shared working files.",
+      "existing_files": "Agents can prepare changes to the same file independently. The harness applies compatible changes to the current shared version in order, without a visible busy-file workflow.",
+      "human_edits": "Small plain Markdown edits remain secondary. The harness must preserve a person’s current text when an agent result arrives; review an ordinary suggested revision if the content changed.",
+      "stale_changes": "Retain the request and base revision. Re-evaluate against current content instead of replaying an old whole-file replacement. Preserve others’ contributions and flag ambiguous or contradictory changes as proposals.",
+      "metadata": "The coordinator records comments and revisions as separate events; agents do not independently replace one shared comments/history JSON file.",
+      "ux": "Default to shared Agent work: person, agent task, tool progress, finished output, and a brief decision when needed. Each person has a separate conversation. Internal drafts, base revisions, locks, and merging are not ordinary product UI.",
+      "external_edits": "OneDrive clients, GitHub pushes, and local tools can bypass app coordination. Provider version checks, revision preservation, and recovery are required; complete conflict prevention is not promised for unrestricted external writes.",
+      "scope": "Parallel agent work, output inspection, and contribution history. No simultaneous collaborative document editing surface.",
+      "implementation_validation_needed": "Verify the chosen provider write API’s check-at-commit behavior, not just a read-then-write or upload-session-start version check.",
+      "t3_refinement": "One writer to the published version does not limit parallel edits to private versions. Isolate longer overlapping work; coordinate publication and integration afterward. Do not imply T3 itself supplies automatic conflict-free merging."
+    }
+  },
+  "precedent_reviews": [
+    {
+      "date": "2026-10-13",
+      "project": "T3 Code / pingdotgg/t3code",
+      "revision": "8ac4b97dae6bff7258fa5091a908116902fbd635",
+      "method": "Read public repository source in a temporary shallow checkout. No application execution or dependency installation.",
+      "findings": [
+        {
+          "pattern": "Isolated worktree option",
+          "evidence": "https://github.com/pingdotgg/t3code/blob/8ac4b97dae6bff7258fa5091a908116902fbd635/apps/server/src/orchestration-v2/ThreadLaunchService.ts#L451",
+          "finding": "Thread launch can create a branch and separate worktree before starting the agent. Independent work can change the same filenames without sharing one working copy."
+        },
+        {
+          "pattern": "Shared-checkout batch option",
+          "evidence": "https://github.com/pingdotgg/t3code/blob/8ac4b97dae6bff7258fa5091a908116902fbd635/apps/server/src/mcp/OrchestratorMcpService.ts#L2309",
+          "finding": "Batch create_threads copies the parent project, branch, and worktree path. Isolation is an explicit option, not a universal guarantee for parallel agents."
+        },
+        {
+          "pattern": "Restore protection",
+          "evidence": "https://github.com/pingdotgg/t3code/blob/8ac4b97dae6bff7258fa5091a908116902fbd635/apps/server/src/orchestration-v2/CheckpointRestoreSafety.ts#L9",
+          "finding": "Whole-checkout file restoration requires an isolated worktree. Other threads, provider sessions, and overlapping checkout paths are checked to prevent reverting another thread’s work."
+        },
+        {
+          "pattern": "Checkpoint-operation locking",
+          "evidence": "https://github.com/pingdotgg/t3code/blob/8ac4b97dae6bff7258fa5091a908116902fbd635/apps/server/src/orchestration-v2/CheckpointService.ts#L257",
+          "finding": "Checkpoint operations are serialized by workspace path. This coordinates snapshot operations; it is not a general lock around all provider filesystem writes."
+        }
+      ],
+      "limits": "No general per-file agent write lock or automatic merge coordinator was found in the inspected launch, orchestration instructions, shared-checkout creation, and checkpoint paths. Worktree isolation moves integration to a later step; it does not eliminate overlapping changes or incompatible intentions.",
+      "product_implication": "Retain an ordered publication path for the current shared folder. Allow agents to prepare and edit independent versions in parallel. Use isolated drafts for lengthy or alternative work; integrate changes with a known base revision and preserve proposals on overlap. GitHub can use native branches/worktrees; OneDrive would require harness-managed private working copies and publication logic.",
+      "scope_boundary": "No branch management required in the ordinary student UX. Small activity labels and change summaries; no simultaneous collaborative text editor."
+    }
+  ]
+}

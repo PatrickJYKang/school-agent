@@ -109,7 +109,7 @@ export const INTERFACE_PERMISSION_FIELDS = new Set(Object.values(PERMISSION_TYPE
  * form and PRESERVE the boolean form — for `schedules`, `interface.schedules: false`
  * is the runtime feature disable that `getLimits` reads, not a permission toggle.
  */
-export const RUNTIME_CONFIG_INTERFACE_FIELDS = new Set<string>(['schedules']);
+export const RUNTIME_CONFIG_INTERFACE_FIELDS = new Set<string>(['schedules', 'school']);
 
 /**
  * YAML sub-keys within composite interface permission fields that map to permission bits.

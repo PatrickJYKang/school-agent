@@ -17,6 +17,7 @@ export type { ScheduleMCPConsentStorage, ScheduleConsentSnapshot } from './sched
 import type {
   FileMethods,
   FileOwnerScope,
+  ReadableDocumentFile,
   ClearFileEmbeddingsParams,
   AvailableProjectFileRecord,
   AvailableProjectFilesOptions,
@@ -604,6 +605,7 @@ export type {
   FileMethods,
   FileStorageMethods,
   FileOwnerScope,
+  ReadableDocumentFile,
   AvailableProjectFileRecord,
   ClearFileCodeEnvRefsParams,
   ClearFileEmbeddingsParams,

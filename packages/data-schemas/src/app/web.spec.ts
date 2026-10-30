@@ -55,6 +55,7 @@ describe('loadWebSearchConfig', () => {
       const result = loadWebSearchConfig(config);
 
       expect(result).toEqual({
+        braveApiKey: '${BRAVE_SEARCH_API_KEY}',
         serperApiKey: '${SERPER_API_KEY}',
         searxngInstanceUrl: '${SEARXNG_INSTANCE_URL}',
         searxngApiKey: '${SEARXNG_API_KEY}',
@@ -76,6 +77,7 @@ describe('loadWebSearchConfig', () => {
 
     it('should preserve provided config values and merge with defaults', () => {
       const config: TCustomConfig['webSearch'] = {
+        braveApiKey: 'custom-brave-key',
         serperApiKey: 'custom-serper-key',
         firecrawlApiKey: 'custom-firecrawl-key',
         firecrawlVersion: 'v2',
@@ -84,6 +86,7 @@ describe('loadWebSearchConfig', () => {
 
       const result = loadWebSearchConfig(config);
 
+      expect(result?.braveApiKey).toBe('custom-brave-key');
       expect(result?.serperApiKey).toBe('custom-serper-key');
       expect(result?.firecrawlApiKey).toBe('custom-firecrawl-key');
       expect(result?.firecrawlVersion).toBe('v2');

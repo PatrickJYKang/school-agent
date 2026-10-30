@@ -52,6 +52,9 @@ export type TModelSpec = {
   /** Hide the chat input tool badge row while this model spec is active. */
   hideBadgeRow?: boolean;
   webSearch?: boolean;
+  canvas?: boolean;
+  documents?: boolean;
+  schoolWeb?: boolean;
   fileSearch?: boolean;
   executeCode?: boolean;
   memory?: boolean;
@@ -199,6 +202,9 @@ export const tModelSpecSchema = z.object({
   executeCode: z.boolean().optional(),
   memory: z.boolean().optional(),
   askUserQuestion: z.boolean().optional(),
+  canvas: z.boolean().optional(),
+  documents: z.boolean().optional(),
+  schoolWeb: z.boolean().optional(),
   runInBackground: z.union([z.boolean(), z.array(z.string())]).optional(),
   describeIntent: z.union([z.boolean(), z.array(z.string())]).optional(),
   artifacts: z.union([z.string(), z.boolean()]).optional(),

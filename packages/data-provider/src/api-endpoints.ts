@@ -22,6 +22,8 @@ if (BASE_URL && BASE_URL.endsWith('/')) {
 
 export const apiBaseUrl = () => BASE_URL;
 
+export const school = (path = '') => `${BASE_URL}/api/school${path}`;
+
 // Testing this buildQuery function
 const buildQuery = (params: Record<string, unknown>): string => {
   const query = Object.entries(params)

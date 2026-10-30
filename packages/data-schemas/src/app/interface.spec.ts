@@ -4,6 +4,22 @@ import type { AppConfig } from '~/types';
 import { loadDefaultInterface, deriveSpecInterface } from './interface';
 
 describe('loadDefaultInterface', () => {
+  it('preserves school policy without enabling it for an unconfigured deployment', async () => {
+    const school = {
+      enabled: true,
+      canvas: { enabled: true, baseUrl: 'https://school.instructure.com' },
+    };
+    const configured = await loadDefaultInterface({
+      config: { interface: { school } },
+      configDefaults: getConfigDefaults(),
+    });
+    const upstream = await loadDefaultInterface({
+      config: {},
+      configDefaults: getConfigDefaults(),
+    });
+    expect(configured?.school).toEqual(school);
+    expect(upstream?.school).toBeUndefined();
+  });
   it('uses the schema default for URL auto-submit when not configured', async () => {
     const interfaceConfig = await loadDefaultInterface({
       config: {},

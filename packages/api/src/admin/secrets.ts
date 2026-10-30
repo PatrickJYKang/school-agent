@@ -61,6 +61,7 @@ const CONFIG_SECRET_FIELDS: readonly ConfigSecretField[] = (
     { path: 'speech.stt.openai.apiKey', allowEnvPlaceholder: true, opaque: true },
     { path: 'speech.stt.azureOpenAI.apiKey', allowEnvPlaceholder: true, opaque: true },
     { path: 'webSearch.serperApiKey', allowEnvPlaceholder: true, opaque: true },
+    { path: 'webSearch.braveApiKey', allowEnvPlaceholder: true, opaque: true },
     { path: 'webSearch.searxngApiKey', allowEnvPlaceholder: true, opaque: true },
     { path: 'webSearch.firecrawlApiKey', allowEnvPlaceholder: true, opaque: true },
     { path: 'webSearch.tavilyApiKey', allowEnvPlaceholder: true, opaque: true },

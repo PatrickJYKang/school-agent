@@ -1,0 +1,19 @@
+# Dependencies for running this checkout with npm. Separate from the full deployment stack.
+name: school-agent-local
+
+services:
+  mongodb:
+    image: mongo:8.0.20
+    ports:
+      - '127.0.0.1:27019:27017'
+    volumes:
+      - mongodb:/data/db
+    healthcheck:
+      test: ['CMD', 'mongosh', '--quiet', '--eval', "quit(db.adminCommand('ping').ok ? 0 : 1)"]
+      interval: 5s
+      timeout: 5s
+      start_period: 10s
+      retries: 20
+
+volumes:
+  mongodb:

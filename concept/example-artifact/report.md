@@ -1,0 +1,16 @@
+# Creek health investigation
+
+## Findings
+
+Nitrate was higher downstream on all six visits.
+
+## Interpretation
+
+This comparison does not establish a cause. Rainfall and sampling conditions could explain some of the difference.
+
+## Next steps
+
+- Check rainfall on sampling days.
+- Collect more paired samples.
+
+![Nitrate readings by sampling location](assets/nitrate.svg)

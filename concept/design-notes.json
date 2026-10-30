@@ -1,0 +1,91 @@
+{
+  "working_title": "Fieldwork",
+  "date": "2026-10-28",
+  "status": "Focused LibreChat fork concept and browser-local HTML prototype. No LibreChat runtime, model, authentication, or connector is installed.",
+  "scope_change": "The current direction is a limited fork/configuration of LibreChat. The earlier independent agent-workspace concept is deferred and preserved.",
+  "deliverables": {
+    "pitch": "index.html",
+    "mockup": "mockup.html",
+    "research": "research.html",
+    "references": "references.json",
+    "broader_concept": "archive/2026-10-13-agent-workspace/overview.html"
+  },
+  "current_scope": [
+    "Reuse LibreChat chat, agents, tool use, attachments, exports, authentication, and access controls.",
+    "Configure school-managed models, groups, tool access, account allowances, and data policy.",
+    "Evaluate the existing admin panel instead of building another administration stack.",
+    "Add a selected-context Canvas course/assignment/rubric picker with source cues.",
+    "Use a per-user Canvas connection and a server-enforced read-only tool allowlist.",
+    "Reuse the existing SharePoint / OneDrive file picker.",
+    "Add a few education helpers, help-style choices, visible teacher guidance, and simplified defaults.",
+    "Teacher helper sharing should use existing agents and resource ACLs."
+  ],
+  "retained_boundaries": [
+    "Open-source institutional distribution.",
+    "Do not replace Canvas, email, messaging, or authoritative document storage.",
+    "Keep prose portable in Markdown; do not build a live Word editor.",
+    "Connected sources remain within the person’s existing access.",
+    "School hosting is distinct from the approved model provider’s data handling."
+  ],
+  "deferred": [
+    "Shared task-folder provisioning and native folder permission management.",
+    "Parallel people/agents work board and isolated working-copy integration.",
+    "Custom artifact collaboration, merge handling, or real-time document editing.",
+    "GitHub, Slack, and Outlook integrations beyond the initial Canvas/Microsoft file-context pilot.",
+    "LTI launch, course roster sync, or per-course budget management until independently justified."
+  ],
+  "archive": {
+    "path": "archive/2026-10-13-agent-workspace",
+    "contains": "Earlier pitch, complete interactive mockup, design log, Markdown example bundle, and final screenshots.",
+    "preserved_from": "2026-10-13",
+    "archived_on": "2026-10-28"
+  },
+  "reuse_plan": {
+    "upstream": "Chat and AI runtime; school SSO; groups and permissions; approved model/tool configuration; account balances; shared agents; file uploads and Microsoft 365 file selection.",
+    "evaluate": "LibreChat Admin Panel preview; Canvas MCP read/authentication implementations; deployment precedents at Stanford and Brown.",
+    "custom": "School-friendly profile, Canvas context picker/citations, focused helper templates, clear help-style and teacher-guidance presentation.",
+    "avoid": "A new harness, LMS, shared filesystem, or editor. No current scope is selected merely because a plugin or upstream feature exists."
+  },
+  "prototype": {
+    "implemented": [
+      "Separate student/educator chats.",
+      "Approved helper/model selection and help styles.",
+      "Canvas course/material picker and sample source inspection.",
+      "Microsoft 365 read-only attachment simulation.",
+      "Local sample CSV calculation and chart.",
+      "Markdown message/conversation downloads.",
+      "Educator helper publishing to a sample group.",
+      "Institution profile, people access toggles, and account allowance views."
+    ],
+    "not_implemented": [
+      "Actual LibreChat fork, login, live model inference, or tool execution.",
+      "Canvas / Microsoft account authorization or API calls.",
+      "General-purpose source grounding, document parsing, live sharing, security enforcement, or retention services."
+    ],
+    "storage": "New browser-local key fieldwork-librechat-pilot-v1. Earlier prototype state is kept separate."
+  },
+  "privacy_and_authorization": "Do not promise that teachers cannot ever obtain student chats or that data never leaves the school. State voluntary sharing, published administrator access policy, and approved model-provider processing. Shared helpers must never confer the author’s source credentials.",
+  "prompt_guidance": "Help styles and teacher instructions steer model behavior; actual authorization comes from platform and connector controls, not prompts.",
+  "source_record": "references.json",
+  "provenance": "All new HTML, CSS, JavaScript, branding, copy, and sample data are original for the brief. No upstream or fork source code has been copied. Source reviews identify reuse candidates, not tested production integrations.",
+  "validation": {
+    "checks": [
+      "Parsed both active JSON records and checked inline JavaScript syntax with node --check.",
+      "Verified desktop pitch, chat, school management, research, and 390 x 844 mobile layouts; no horizontal overflow in mobile chat or management.",
+      "Verified Canvas material selection and preservation of earlier source citations after changing course context.",
+      "Verified sample-data analysis and a newly uploaded two-row synthetic CSV (means 3.00 and 6.00; paired difference 3.00).",
+      "Verified educator helper publication and visibility within the sample student group.",
+      "Verified disabling data analysis and pausing a sample account affect the student controls.",
+      "Verified separate student, educator, and administrator views; administrator navigation does not list personal chats.",
+      "No browser console warnings or errors were recorded during final QA.",
+      "Checked local HTML links and preserved archive/example files."
+    ],
+    "limit": "Local scripted simulation. Candidate integrations were researched, not deployed.",
+    "previews": [
+      "previews/pitch-librechat.jpg",
+      "previews/mockup-librechat.jpg",
+      "previews/admin-librechat.jpg",
+      "previews/mockup-librechat-mobile.jpg"
+    ]
+  }
+}

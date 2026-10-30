@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "document_id": "sample-creek-report",
+  "comments": [
+    {
+      "id": "c1",
+      "author": "sample-jordan",
+      "body": "Could we compare rainfall on the sampling days?",
+      "status": "open",
+      "anchor": {
+        "revision": "r2",
+        "quote": "Rainfall and sampling conditions could explain some of the difference.",
+        "prefix": "This comparison does not establish a cause. ",
+        "suffix": "",
+        "resolution": "matched"
+      }
+    }
+  ]
+}

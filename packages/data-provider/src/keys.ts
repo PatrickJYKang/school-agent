@@ -1,4 +1,7 @@
 export enum QueryKeys {
+  school = 'school',
+  canvasCourses = 'canvasCourses',
+  canvasMaterials = 'canvasMaterials',
   messages = 'messages',
   /* Full content of one tool-call part, fetched when its preview is not enough */
   toolCallPart = 'toolCallPart',
@@ -136,6 +139,9 @@ export const DynamicQueryKeys = {
 } as const;
 
 export enum MutationKeys {
+  connectSchoolCanvas = 'connectSchoolCanvas',
+  disconnectSchoolCanvas = 'disconnectSchoolCanvas',
+  prepareCanvasContext = 'prepareCanvasContext',
   approveCodeSetup = 'approveCodeSetup',
   denyCodeSetup = 'denyCodeSetup',
   resetToolApprovalGrants = 'resetToolApprovalGrants',

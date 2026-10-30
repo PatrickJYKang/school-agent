@@ -253,6 +253,10 @@ export type FileOwnerScope = {
   userId: string;
   tenantId?: string | null;
 };
+export type ReadableDocumentFile = Pick<
+  TFile,
+  'file_id' | 'filename' | 'type' | 'bytes' | 'filepath' | 'source' | 'storageKey' | 'storageRegion'
+>;
 
 export type ExpiredFileQueryOptions = {
   now?: Date;
@@ -403,6 +407,10 @@ function serializeRunArtifact(
 
 /** Factory function that takes mongoose instance and returns the file methods */
 export function createFileMethods(mongoose: typeof import('mongoose')): {
+  getReadableDocumentFiles: (
+    fileIds: readonly string[],
+    owner: FileOwnerScope,
+  ) => Promise<ReadableDocumentFile[]>;
   getRunFileCandidates: (fileIds: readonly string[], tenantId?: string | null) => Promise<TFile[]>;
   claimRunArtifactFile: (scope: RunArtifactScope) => Promise<RunArtifactClaim>;
   publishRunArtifactFile: (input: PublishRunArtifactInput) => Promise<RunArtifactFile>;
@@ -509,6 +517,27 @@ export function createFileMethods(mongoose: typeof import('mongoose')): {
   ) => Promise<number>;
   sweepOrphanedPreviews: (maxAgeMs?: number) => Promise<number>;
 } {
+  async function getReadableDocumentFiles(
+    fileIds: readonly string[],
+    owner: FileOwnerScope,
+  ): Promise<ReadableDocumentFile[]> {
+    if (!owner.userId || fileIds.length === 0) return [];
+    const File = mongoose.models.File as Model<IMongoFile>;
+    const records = await File.find({
+      user: owner.userId,
+      tenantId: owner.tenantId ?? null,
+      file_id: { $in: fileIds },
+      llmDeliveryPath: { $ne: 'none' },
+      ...codeFileStorageFilter(),
+      $and: [
+        { $or: [{ expiresAt: null }, { expiresAt: { $gt: new Date() } }] },
+        { $or: [{ expiredAt: null }, { expiredAt: { $gt: new Date() } }] },
+      ],
+    })
+      .select('file_id filename type bytes filepath source storageKey storageRegion -_id')
+      .lean<ReadableDocumentFile[]>();
+    return records;
+  }
   /** Hydrates only host-selected IDs; the caller applies its existing agent-file authorization. */
   async function getRunFileCandidates(
     fileIds: readonly string[],
@@ -2013,6 +2042,7 @@ export function createFileMethods(mongoose: typeof import('mongoose')): {
     getToolFilesByIds,
     getCodeGeneratedFiles,
     getUserCodeFiles,
+    getReadableDocumentFiles,
     getDeferredProvisionFiles,
     claimCodeFile,
     commitCodeFile,

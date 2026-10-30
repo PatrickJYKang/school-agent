@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 490 255" role="img" aria-label="Illustrative paired nitrate readings">
+<rect width="490" height="255" fill="white"/>
+<g font-family="sans-serif" font-size="11" fill="#526258">
+<text x="48" y="18">Nitrate (mg/L) · Illustrative samples</text>
+<path d="M48 205H455" stroke="#dfe6db"/><text x="35" y="209" text-anchor="end">0</text>
+<path d="M48 150H455" stroke="#dfe6db"/><text x="35" y="154" text-anchor="end">1</text>
+<path d="M48 95H455" stroke="#dfe6db"/><text x="35" y="99" text-anchor="end">2</text>
+<path d="M48 40H455" stroke="#dfe6db"/><text x="35" y="44" text-anchor="end">3</text>
+<text x="48" y="225" text-anchor="middle">1</text>
+<text x="126" y="225" text-anchor="middle">2</text>
+<text x="204" y="225" text-anchor="middle">3</text>
+<text x="282" y="225" text-anchor="middle">4</text>
+<text x="360" y="225" text-anchor="middle">5</text>
+<text x="438" y="225" text-anchor="middle">6</text>
+<text x="48" y="246">Visit</text><text x="150" y="246" fill="#4c7190">Upstream</text><text x="275" y="246" fill="#aa5837">Downstream</text></g>
+<polyline points="48,166.5 126,161.0 204,161.0 282,155.5 360,150 438,161.0" fill="none" stroke="#4c7190" stroke-width="2.4"/>
+<circle cx="48" cy="166.5" r="3" fill="#4c7190"/>
+<circle cx="126" cy="161.0" r="3" fill="#4c7190"/>
+<circle cx="204" cy="161.0" r="3" fill="#4c7190"/>
+<circle cx="282" cy="155.5" r="3" fill="#4c7190"/>
+<circle cx="360" cy="150" r="3" fill="#4c7190"/>
+<circle cx="438" cy="161.0" r="3" fill="#4c7190"/>
+<polyline points="48,106.0 126,89.5 204,95 282,78.50000000000001 360,73.0 438,83.99999999999999" fill="none" stroke="#aa5837" stroke-width="2.4"/>
+<circle cx="48" cy="106.0" r="3" fill="#aa5837"/>
+<circle cx="126" cy="89.5" r="3" fill="#aa5837"/>
+<circle cx="204" cy="95" r="3" fill="#aa5837"/>
+<circle cx="282" cy="78.50000000000001" r="3" fill="#aa5837"/>
+<circle cx="360" cy="73.0" r="3" fill="#aa5837"/>
+<circle cx="438" cy="83.99999999999999" r="3" fill="#aa5837"/>
+</svg>

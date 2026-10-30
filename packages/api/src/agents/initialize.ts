@@ -131,6 +131,7 @@ import { assertModelBoundContent } from '../middleware/modelBoundContent';
 import { resolveAttachedWorkspaceReadFileLines } from '~/code/workspace';
 import { isValidInstructionsPromptLink } from './instructions/linked';
 import { PARTIAL_RESOLVED_CONVERSATION } from './conversationSymbols';
+import { addSchoolDocumentResources } from '~/school/documents/tool';
 import { registerMemoryTools, memoryToolUsageGuard } from './memory';
 import { isImplicitStatefulCodeRouteAvailable } from '~/code/config';
 import { applyIntentLabels, sanitizeIntentLabels } from './intent';
@@ -2171,7 +2172,11 @@ export async function initializeAgent(
     params.fileSearchAvailable,
     primedProvisionState,
   );
-  runtimeToolResources = projectResources.resources;
+  runtimeToolResources = addSchoolDocumentResources(
+    projectResources.resources,
+    primedAttachments,
+    effectiveToolNames,
+  );
   const provisionState = projectResources.provisionState;
   const dropFileSearchResources = (): void => {
     if (runtimeToolResources?.[EToolResources.file_search] == null) {

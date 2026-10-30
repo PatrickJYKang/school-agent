@@ -1,0 +1,10 @@
+{
+  "repository": "https://github.com/LibreChat-AI/admin-panel.git",
+  "revision": "f2601cbf3216a62c12e5f9d21810eb9ada95fa63",
+  "license": "AGPL-3.0",
+  "runtime": "bun@1.4.3",
+  "url": "http://localhost:3000",
+  "patch": "config/admin-panel.patch",
+  "patches": ["config/admin-panel.patch", "config/admin-school.patch"],
+  "scope": "Upstream panel with a module-resolution compatibility patch and native configuration controls for school tool policy; local development only."
+}

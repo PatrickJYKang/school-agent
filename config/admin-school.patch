@@ -1,0 +1,156 @@
+diff --git a/src/components/configuration/meta/features.ts b/src/components/configuration/meta/features.ts
+index 0f15746..1f1469f 100644
+--- a/src/components/configuration/meta/features.ts
++++ b/src/components/configuration/meta/features.ts
+@@ -2,6 +2,23 @@ import type * as t from '@/types';
+
+ /** Labels and help for the interface settings, read in their groups (FX-5). */
+ const INTERFACE_META: t.FieldMetaRegistry = {
++  'interface.school': { labelKey: 'com_school_settings' },
++  'interface.school.externalLinks': { labelKey: 'com_school_external_links' },
++  'interface.school.externalLinks.enabled': {
++    labelKey: 'com_school_external_links_enabled',
++    runtimeDefault: true,
++  },
++  'interface.school.webSearch': { labelKey: 'com_school_search' },
++  'interface.school.webSearch.enabled': {
++    labelKey: 'com_school_search_enabled',
++    runtimeDefault: true,
++  },
++  'interface.school.documents': { labelKey: 'com_school_documents' },
++  'interface.school.documents.enabled': {
++    labelKey: 'com_school_documents_enabled',
++    runtimeDefault: false,
++  },
++  'webSearch.braveApiKey': { labelKey: 'com_school_brave_key', secret: true },
+   'interface.customWelcome': { labelKey: 'com_config_label_interface_customWelcome' },
+   'interface.privacyPolicy.externalUrl': { labelKey: 'com_config_label_privacy_url' },
+   'interface.privacyPolicy.openNewTab': {
+diff --git a/src/locales/en/translation.json b/src/locales/en/translation.json
+index 19e1a5a..677a5b7 100644
+--- a/src/locales/en/translation.json
++++ b/src/locales/en/translation.json
+@@ -3723,5 +3723,13 @@
+   "com_a11y_secret_cancel_replace": "Cancel replacing {{name}}",
+   "com_config_validation_more": "...and {{count}} more",
+   "com_scope_delete_error": "Failed to delete configuration",
+-  "com_a11y_logo_alt": "LibreChat logo"
++  "com_a11y_logo_alt": "LibreChat logo",
++  "com_school_settings": "School workspace",
++  "com_school_external_links": "External links",
++  "com_school_external_links_enabled": "Allow fetching external links",
++  "com_school_search": "Brave web search",
++  "com_school_search_enabled": "Allow web search",
++  "com_school_documents": "Document reading",
++  "com_school_documents_enabled": "Allow document reading",
++  "com_school_brave_key": "Institution Brave Search API key"
+ }
+diff --git a/src/server/config/base.ts b/src/server/config/base.ts
+index a128015..f314b18 100644
+--- a/src/server/config/base.ts
++++ b/src/server/config/base.ts
+@@ -1,5 +1,5 @@
+ import { queryOptions } from '@tanstack/react-query';
+-import { configSchema } from 'librechat-data-provider';
++import { configSchema } from '@/school/schema';
+ import { createServerFn } from '@tanstack/react-start';
+ import type * as t from '@/types';
+ import { normalizeAppServiceKeys, readConfiguredValues } from './normalize';
+diff --git a/src/server/config/import.ts b/src/server/config/import.ts
+index ca96d5f..dc097a9 100644
+--- a/src/server/config/import.ts
++++ b/src/server/config/import.ts
+@@ -1,6 +1,6 @@
+ import { z } from 'zod';
+ import yaml from 'js-yaml';
+-import { configSchema } from 'librechat-data-provider';
++import { configSchema } from '@/school/schema';
+ import { createServerFn } from '@tanstack/react-start';
+ import type { ZodIssue } from 'zod/v3';
+ import type * as t from '@/types';
+diff --git a/src/server/config/schema.ts b/src/server/config/schema.ts
+index a9f4e99..95e181f 100644
+--- a/src/server/config/schema.ts
++++ b/src/server/config/schema.ts
+@@ -1,5 +1,5 @@
+ import { queryOptions } from '@tanstack/react-query';
+-import { configSchema } from 'librechat-data-provider';
++import { configSchema } from '@/school/schema';
+ import { createServerFn } from '@tanstack/react-start';
+ import type { TStartupConfig } from 'librechat-data-provider';
+ import type * as t from '@/types';
+diff --git a/src/school/schema.ts b/src/school/schema.ts
+new file mode 100644
+index 0000000..54a2a33
+--- /dev/null
++++ b/src/school/schema.ts
+@@ -0,0 +1,42 @@
++import { z } from 'zod/v3';
++import { configSchema as upstreamSchema } from 'librechat-data-provider';
++
++// This pinned panel uses Zod 3. These controls mirror the fork's server-validated policy;
++// unknown limits remain visible and are preserved by the panel's leaf-level updates.
++const school = z
++  .object({
++    enabled: z.boolean().optional(),
++    name: z.string().optional(),
++    guidance: z.string().optional(),
++    timeZone: z.string().optional(),
++    externalLinks: z.object({ enabled: z.boolean().default(true) }).optional(),
++    webSearch: z
++      .object({
++        enabled: z.boolean().default(true),
++        safeSearch: z.enum(['off', 'moderate', 'strict']).default('strict'),
++      })
++      .optional(),
++    documents: z.object({ enabled: z.boolean().default(false) }).optional(),
++    canvas: z
++      .object({
++        enabled: z.boolean().optional(),
++        toolCalling: z.boolean().optional(),
++        baseUrl: z.string().optional(),
++      })
++      .optional(),
++  })
++  .optional();
++
++// Normalize the object boundary across the two installed Zod 3 declaration versions.
++const base = upstreamSchema as unknown as z.AnyZodObject;
++const interfaceSchema = upstreamSchema.shape.interface.removeDefault() as unknown as z.AnyZodObject;
++const webSchema = upstreamSchema.shape.webSearch.unwrap() as unknown as z.AnyZodObject;
++export const configSchema = base.extend({
++  interface: interfaceSchema.extend({ school }).default({}),
++  webSearch: webSchema
++    .extend({
++      braveApiKey: z.string().optional().default('${BRAVE_SEARCH_API_KEY}'),
++      braveApiKeyPreview: z.string().optional(),
++    })
++    .optional(),
++});
+diff --git a/src/school/schema.test.ts b/src/school/schema.test.ts
+new file mode 100644
+index 0000000..867800e
+--- /dev/null
++++ b/src/school/schema.test.ts
+@@ -0,0 +1,21 @@
++import { it, expect } from 'vitest';
++import { configSchema } from './schema';
++import { extractSchemaTree, flattenTree } from '@/server/config/schema';
++import type * as t from '@/types';
++
++it('exposes school link, document and Brave settings in the pinned panel schema', () => {
++  const fields = flattenTree(extractSchemaTree(configSchema as t.ZodSchemaLike));
++  expect(fields.map((field) => field.path)).toEqual(
++    expect.arrayContaining([
++      'interface.school.externalLinks.enabled',
++      'interface.school.webSearch.enabled',
++      'interface.school.documents.enabled',
++      'webSearch.braveApiKey',
++    ]),
++  );
++  expect(
++    configSchema.parse({ version: '1.3.18', interface: { school: { externalLinks: {} } } }),
++  ).toMatchObject({
++    interface: { school: { externalLinks: { enabled: true } } },
++  });
++});

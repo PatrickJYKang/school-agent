@@ -78,6 +78,7 @@ export async function loadDefaultInterface({
   const shouldDisableMemories = memoryConfig && !memoryEnabled;
 
   const loadedInterface: AppConfig['interfaceConfig'] = removeNullishValues({
+    school: interfaceConfig?.school,
     // UI elements - use schema defaults
     modelSelect:
       interfaceConfig?.modelSelect ??

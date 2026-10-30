@@ -32,6 +32,14 @@ const {
   withRequestCodeInputs,
   resolveAgentCodeExecution,
   resolveMCPClientCapabilityProfile,
+  createCanvasTool,
+  createSchoolDocumentTool,
+  createSchoolWebTool,
+  createSchoolDocumentTransport,
+  readSchoolDocument,
+  resolveDownloadPath,
+  decryptCredential,
+  createProxyAwareFetch,
 } = require('@librechat/api');
 const {
   AuthType,
@@ -70,9 +78,17 @@ const { createOpenIDSessionTokenProvider } = require('~/server/services/OpenIDSe
 const { createFileSearchTool, primeFiles: primeSearchFiles } = require('./fileSearch');
 const { primeFiles: primeCodeFiles } = require('~/server/services/Files/Code/process');
 const { loadAuthValues } = require('~/server/services/Tools/credentials');
-const { getMCPServerTools, checkCapability } = require('~/server/services/Config');
+const { getMCPServerTools, checkCapability, getAppConfig } = require('~/server/services/Config');
 const { getMCPServersRegistry } = require('~/config');
-const { getRoleByName, setMemory, deleteMemory, getFormattedMemories } = require('~/models');
+const {
+  getRoleByName,
+  setMemory,
+  deleteMemory,
+  getFormattedMemories,
+  findOnePluginAuth,
+  getReadableDocumentFiles,
+} = require('~/models');
+const { getStrategyFunctions } = require('~/server/services/Files/strategies');
 
 /** @typedef {typeof import('@librechat/agents/langchain/tools').Tool} ToolConstructor */
 /** @typedef {import('@librechat/agents/langchain/tools').Tool} Tool */
@@ -160,6 +176,45 @@ const loadTools = async ({
   };
 
   const customConstructors = {
+    web: () =>
+      createSchoolWebTool({
+        user: options.req?.user,
+        signal,
+        deps: {
+          getAppConfig,
+          readDocument: readSchoolDocument,
+          createDocumentTransport: createSchoolDocumentTransport,
+        },
+      }),
+    documents: () =>
+      createSchoolDocumentTool({
+        user: options.req?.user,
+        fileIds: options.tool_resources?.[EToolResources.context]?.file_ids ?? [],
+        signal,
+        deps: {
+          getAppConfig,
+          getFiles: getReadableDocumentFiles,
+          readDocument: readSchoolDocument,
+          getStream: (file) =>
+            getStrategyFunctions(file.source).getDownloadStream(
+              options.req,
+              resolveDownloadPath(file),
+            ),
+        },
+      }),
+    canvas: () =>
+      createCanvasTool({
+        user: options.req?.user,
+        signal,
+        deps: {
+          getAppConfig,
+          store: { findOnePluginAuth },
+          decrypt: decryptCredential,
+          fetchFn: createProxyAwareFetch(),
+          readDocument: readSchoolDocument,
+          createDocumentTransport: createSchoolDocumentTransport,
+        },
+      }),
     github_compare: () =>
       createGitHubCompareTool({
         config: options.req?.config?.githubCompare,

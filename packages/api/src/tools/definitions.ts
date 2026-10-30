@@ -1,4 +1,3 @@
-import { bindToolApproval, bindToolApprovalIdentity, getToolApprovalIdentity } from './approval';
 /**
  * @fileoverview Tool definitions loader for event-driven mode.
  * Loads tool definitions without creating tool instances for efficient initialization.
@@ -16,11 +15,16 @@ import {
   buildServerNameAliases,
 } from 'librechat-data-provider';
 import type { LCToolRegistry, JsonSchemaType, LCTool, GenericTool } from '@librechat/agents';
-import type { AgentToolOptions } from 'librechat-data-provider';
+import type { TCustomConfig, AgentToolOptions } from 'librechat-data-provider';
 import type { CodeEnvironmentConfig, CodeExecutionContext } from '~/agents/execution';
 import type { CodeCapabilityConfigLoader } from '~/code/capabilities';
 import type { MCPToolAlias, ToolDefinition } from './classification';
+import { bindToolApproval, bindToolApprovalIdentity, getToolApprovalIdentity } from './approval';
 import { resolveJsonSchemaRefs, normalizeJsonSchema, sanitizeGeminiSchema } from '~/mcp/zod';
+import { schoolWebToolDefinition, schoolWebToolsEnabled } from '~/school/web/tool';
+import { canvasToolDefinition, schoolCanvasToolsEnabled } from '~/school/tools';
+import { schoolDocumentsEnabled } from '~/school/documents/policy';
+import { documentToolDefinition } from '~/school/documents/tool';
 import { buildToolClassification } from './classification';
 import { getToolDefinition } from './registry/definitions';
 import { toolkitExpansion } from './toolkits/mapping';
@@ -46,6 +50,9 @@ export interface LoadToolDefinitionsParams {
   tools: string[];
   /** Explicit deployment opt-in for read-only GitHub comparisons. */
   githubCompareEnabled?: boolean;
+  school?: NonNullable<TCustomConfig['interface']>['school'];
+  includedTools?: string[];
+  filteredTools?: string[];
   /** Agent-specific tool options */
   toolOptions?: AgentToolOptions;
   /** Whether deferred tools feature is enabled */
@@ -187,6 +194,21 @@ export async function loadToolDefinitions(
   let resolvedMCPToolCount = 0;
 
   for (const toolName of tools) {
+    if (toolName === schoolWebToolDefinition.name) {
+      if (schoolWebToolsEnabled(params.school, params))
+        builtInToolDefs.push(schoolWebToolDefinition);
+      continue;
+    }
+    if (toolName === documentToolDefinition.name) {
+      if (schoolDocumentsEnabled(params.school, params))
+        builtInToolDefs.push(documentToolDefinition);
+      continue;
+    }
+    if (toolName === canvasToolDefinition.name) {
+      if (schoolCanvasToolsEnabled(params.school, params))
+        builtInToolDefs.push(canvasToolDefinition);
+      continue;
+    }
     if (toolName === GitHubCompareToolName && params.githubCompareEnabled !== true) {
       continue;
     }

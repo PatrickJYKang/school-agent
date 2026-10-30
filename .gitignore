@@ -52,6 +52,7 @@ __blobstorage__/**/*
 # see https://npmjs.org/doc/faq.html#Should-I-check-my-node_modules-folder-into-git
 node_modules/
 .node_modules-*
+.local/
 meili_data/
 api/node_modules/
 client/node_modules/
@@ -88,6 +89,9 @@ cache.json
 api/data/
 owner.yml
 archive
+# Preserve the earlier school-agent concept referenced by the current pitch.
+!concept/archive/
+!concept/archive/**
 .vscode/settings.json
 src/style - official.css
 /e2e/specs/.test-results/

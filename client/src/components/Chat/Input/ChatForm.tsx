@@ -70,6 +70,7 @@ import ProjectLandingChip from '../ProjectLandingChip';
 import useHasAccess from '~/hooks/Roles/useHasAccess';
 import useDictation from '~/hooks/Input/useDictation';
 import { useGetStartupConfig } from '~/data-provider';
+import SchoolCanvas from '~/components/School/Canvas';
 import CodeWorkspaceMenu from './CodeWorkspaceMenu';
 import CodeApprovalMenu from './CodeApprovalMenu';
 import TextareaHeader from './TextareaHeader';
@@ -849,6 +850,14 @@ const ChatForm = memo(function ChatForm({
               )}
             >
               <TextareaHeader addedConvo={addedConvo} setAddedConvo={setAddedConvo} />
+              <SchoolCanvas
+                index={index}
+                conversation={conversation}
+                disabled={disableInputs}
+                files={files}
+                setFiles={setFiles}
+                setFilesLoading={setFilesLoading}
+              />
               <Tray
                 items={composerItems}
                 focusComposer={focusTextArea}

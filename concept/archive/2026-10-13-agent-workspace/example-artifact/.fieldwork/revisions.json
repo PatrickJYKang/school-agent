@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "head": "r2",
+  "revisions": [
+    {
+      "id": "r1",
+      "parent": null,
+      "author": "sample-casey",
+      "summary": "Working copy created",
+      "snapshot": ".fieldwork/history/r1.md",
+      "sha256": "65bd21c73a02ba54f7af4dbebcd4db5965033cd4d86048c4842669ce4a917ae2",
+      "assets": {}
+    },
+    {
+      "id": "r2",
+      "parent": "r1",
+      "author": "sample-casey",
+      "summary": "Generated image reference added",
+      "snapshot": ".fieldwork/history/r2.md",
+      "sha256": "bec662a107c4ab911f8c0d84349b3022ade6de5e1315fa39a82cf986908a525d",
+      "assets": {
+        "assets/nitrate.svg": {
+          "snapshot": ".fieldwork/history/r2-assets/nitrate.svg",
+          "sha256": "4c40eb85ee5b2526def648cb012e0f8cd7ec0f7df57d14647e59dfdb91ca8235"
+        }
+      }
+    }
+  ]
+}

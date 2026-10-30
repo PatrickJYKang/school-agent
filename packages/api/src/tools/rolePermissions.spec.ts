@@ -1,4 +1,10 @@
-import { Tools, Permissions, EToolResources, PermissionTypes } from 'librechat-data-provider';
+import {
+  Tools,
+  Permissions,
+  EToolResources,
+  PermissionTypes,
+  SCHOOL_WEB_TOOL_NAME,
+} from 'librechat-data-provider';
 import type { Request as ServerRequest } from 'express';
 import type { IRole } from '@librechat/data-schemas';
 import {
@@ -30,6 +36,7 @@ describe('tool role permission maps', () => {
     expect(toolRolePermissions[Tools.file_search]).toBe(PermissionTypes.FILE_SEARCH);
     expect(toolRolePermissions[Tools.execute_code]).toBe(PermissionTypes.RUN_CODE);
     expect(toolRolePermissions[Tools.web_search]).toBe(PermissionTypes.WEB_SEARCH);
+    expect(toolRolePermissions[SCHOOL_WEB_TOOL_NAME]).toBe(PermissionTypes.WEB_SEARCH);
   });
 
   /** The Assistants builder uploads under `code_interpreter`, not `execute_code`,
@@ -54,6 +61,18 @@ describe('tool role permission maps', () => {
 });
 
 describe('checkToolRolePermission', () => {
+  it('withholds the school web tool when the native Web Search role permission is denied', async () => {
+    const canUse = await resolveToolRolePermissions({
+      req: buildReq(),
+      tools: [SCHOOL_WEB_TOOL_NAME],
+      getRoleByName: jest
+        .fn()
+        .mockResolvedValue(
+          buildRole({ [PermissionTypes.WEB_SEARCH]: { [Permissions.USE]: false } }),
+        ),
+    });
+    expect(canUse(SCHOOL_WEB_TOOL_NAME)).toBe(false);
+  });
   it('grants when the role carries the permission', async () => {
     const getRoleByName = jest.fn().mockResolvedValue(buildRole());
 

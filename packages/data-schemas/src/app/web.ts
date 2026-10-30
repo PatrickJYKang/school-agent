@@ -251,6 +251,7 @@ export function loadWebSearchConfig(
 
   return {
     ...config, // Preserve provider-specific option blocks such as firecrawlOptions and tavilySearchOptions.
+    braveApiKey: config?.braveApiKey ?? '${BRAVE_SEARCH_API_KEY}',
     safeSearch,
     searxngSearchOptions,
     jinaApiKey,

@@ -40,6 +40,7 @@ import {
   scheduledMCPReadOnlyPolicySchema,
 } from './types/scheduleConsent';
 import { partialWithoutDefaults } from './zod';
+import { schoolSchema } from './school';
 
 export const AGENT_BACKGROUND_COMPLETION_RESULT_MAX_CHARS_DEFAULT = 24 * 1024;
 export const AGENT_BACKGROUND_COMPLETION_RESULT_MAX_CHARS_HARD_MAX = 64 * 1024;
@@ -3073,6 +3074,7 @@ export const isForcedTemporaryRetention = (mode?: RetentionMode | null): boolean
 
 export const interfaceSchema = z
   .object({
+    school: schoolSchema.optional(),
     theme: deploymentThemeSchema.optional(),
     privacyPolicy: z
       .object({
@@ -3829,6 +3831,8 @@ export function normalizeSearxngEngines(engines?: string | string[]): string | u
 
 export const webSearchSchema = z.object({
   allowedAddresses: allowedAddressesSchema,
+  braveApiKey: z.string().optional().default('${BRAVE_SEARCH_API_KEY}'),
+  braveApiKeyPreview: apiKeyPreviewSchema,
   serperApiKey: z.string().optional().default('${SERPER_API_KEY}'),
   serperApiKeyPreview: apiKeyPreviewSchema,
   searxngInstanceUrl: z.string().optional().default('${SEARXNG_INSTANCE_URL}'),

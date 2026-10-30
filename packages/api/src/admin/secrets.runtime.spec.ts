@@ -28,6 +28,7 @@ import {
 import { createEnvReferencePolicy, neutralizeEnvReferences } from '~/app/allowlist';
 import { resolveTenantCredentials } from '~/langfuse/utils';
 import { resolveConfigOverrides } from '~/app/overrides';
+import { readBraveSearchKey } from '~/school/web/search';
 import { uploadMistralOCR } from '~/files/mistral/crud';
 import { getCustomEndpointConfig } from '~/app/config';
 import { loadWebSearchAuth } from '~/web';
@@ -303,6 +304,10 @@ const STT_SERVICE = { module: 'api/server/services/Files/Audio/STTService.js' };
  * a new registry entry needs a row here (or in `UNREAD_SECRET_FIELDS`).
  */
 const RUNTIME_READERS: Readonly<Record<string, RuntimeReader>> = {
+  'webSearch.braveApiKey': {
+    module: 'packages/api/src/school/web/search.ts',
+    probe: async (stored) => readBraveSearchKey({ braveApiKey: stored }),
+  },
   'langfuse.secretKey': {
     module: 'packages/api/src/langfuse/utils.ts',
     probe: async (stored) =>

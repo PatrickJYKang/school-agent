@@ -6,6 +6,14 @@ import type {
   TTraceRecordParams,
   TTraceRecordDetail,
 } from './types/traces';
+import type {
+  SchoolStatus,
+  CanvasCourse,
+  CanvasMaterial,
+  CanvasList,
+  CanvasContext,
+  CanvasSelection,
+} from './school';
 import type { TInsightsAccessResponse, TInsightsParams, TInsightsResponse } from './types/insights';
 import type { ScheduleMCPConsentView, ConfirmScheduleMCPConsent } from './types/scheduleConsent';
 import type { CodeSetupAttempt, CodeSetupApprovalRequest } from './codeSetup';
@@ -28,6 +36,25 @@ import * as sk from './types/skills';
 import * as f from './types/files';
 import * as config from './config';
 import request from './request';
+
+export const getSchoolStatus = (): Promise<SchoolStatus> => request.get(endpoints.school());
+export const connectSchoolCanvas = (token: string): Promise<{ connected: boolean }> =>
+  request.put(endpoints.school('/canvas/connection'), { token });
+export const disconnectSchoolCanvas = (): Promise<void> =>
+  request.delete(endpoints.school('/canvas/connection'));
+export const getCanvasCourses = (): Promise<CanvasList<CanvasCourse>> =>
+  request.get(endpoints.school('/canvas/courses'));
+export const getCanvasMaterials = (
+  courseId: string,
+  kind: 'assignment' | 'page',
+): Promise<CanvasList<CanvasMaterial>> =>
+  request.get(
+    endpoints.school(
+      `/canvas/courses/${encodeURIComponent(courseId)}/${kind === 'assignment' ? 'assignments' : 'pages'}`,
+    ),
+  );
+export const getCanvasContext = (selections: CanvasSelection[]): Promise<CanvasContext> =>
+  request.post(endpoints.school('/canvas/context'), { selections });
 import * as s from './schemas';
 import * as r from './roles';
 

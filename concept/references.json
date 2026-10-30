@@ -1,0 +1,119 @@
+{
+  "checked": "2026-10-28",
+  "review_method": "Read official product documentation, institutional service documentation, GitHub repository metadata, READMEs, and the named StingChat commit. No candidate was installed or run.",
+  "version_note": "LibreChat documentation was labeled Latest (dev). The releases collection listed v0.8.9-rc1, published 2026-10-26, and v0.8.8, published 2026-10-01; both were marked prerelease by GitHub. Pin and verify a release before implementation. Documentation is evidence of capability, not a test of a deployment.",
+  "sources": [
+    {
+      "id": "core",
+      "name": "LibreChat",
+      "type": "Upstream foundation",
+      "url": "https://github.com/LibreChat-AI/LibreChat",
+      "evidence": "https://www.librechat.ai/docs/features/agents",
+      "status": "Existing upstream capabilities",
+      "finding": "Chat, agents, tools, file context, and exports provide the base. Configure approved capabilities instead of rebuilding the chat harness.",
+      "reuse": "Retain the conversation UI and agent/tool runtime.",
+      "limit": "This deliverable is a concept prototype, not a running LibreChat fork.",
+      "license": "MIT"
+    },
+    {
+      "id": "controls",
+      "name": "LibreChat access controls and balances",
+      "type": "Upstream configuration",
+      "url": "https://www.librechat.ai/docs/features/access_control",
+      "evidence": "https://www.librechat.ai/docs/configuration/librechat_yaml/object_structure/balance",
+      "status": "Documented upstream",
+      "finding": "Roles, groups, resource access, and account credit balances cover much of institution management.",
+      "reuse": "Configure school profiles and approved helpers; use upstream balances for account allowances.",
+      "limit": "The balance reference describes application-wide defaults. Do not claim a new course-budget system or assume every latest-doc feature is in a chosen release."
+    },
+    {
+      "id": "admin",
+      "name": "LibreChat Admin Panel",
+      "type": "Reusable management application",
+      "url": "https://github.com/LibreChat-AI/admin-panel",
+      "evidence": "https://www.librechat.ai/docs/features/admin_panel",
+      "status": "Preview",
+      "finding": "A separate management UI covers users, groups, roles, and configuration overrides.",
+      "reuse": "Evaluate and adapt the existing panel rather than build a second administration stack.",
+      "limit": "Preview maturity and compatibility require evaluation. This application has a separate license.",
+      "license": "AGPL-3.0"
+    },
+    {
+      "id": "microsoft",
+      "name": "LibreChat SharePoint / OneDrive picker",
+      "type": "Existing integration",
+      "url": "https://www.librechat.ai/docs/configuration/sharepoint",
+      "status": "Documented upstream",
+      "finding": "Select Microsoft 365 files and attach them to a conversation using Entra-based access.",
+      "reuse": "Keep this file-context path in the pilot.",
+      "limit": "Read/attach functionality, not shared task folders, live document editing, or file write-back. Requires tenant configuration."
+    },
+    {
+      "id": "canvas",
+      "name": "bruchris/canvas-lms-mcp",
+      "type": "Community Canvas connector",
+      "url": "https://github.com/bruchris/canvas-lms-mcp",
+      "evidence": "https://github.com/bruchris/canvas-lms-mcp/blob/main/docs/oauth-profile.md",
+      "status": "Implementation candidate",
+      "finding": "Implements Canvas tools and an OAuth-brokered multi-user connection profile.",
+      "reuse": "Evaluate a narrow set of course, assignment, page, and rubric reads for LibreChat.",
+      "limit": "The connector also exposes broad teaching/admin operations. Enforce the pilot allowlist and per-user access on the server; hiding tools or adding prompt instructions is insufficient. Compatibility and permissions remain untested here.",
+      "license": "MIT"
+    },
+    {
+      "id": "canvas-alt",
+      "name": "vishalsachdev/canvas-mcp",
+      "type": "Alternative Canvas connector",
+      "url": "https://github.com/vishalsachdev/canvas-mcp",
+      "status": "Implementation candidate",
+      "finding": "Provides student and educator Canvas workflows, including tools far beyond selected course-context reads.",
+      "reuse": "Compare its read tools and client support with the other candidate.",
+      "limit": "No connector has been selected or validated for the school. Raw tool counts and repository activity are not evidence of suitability."
+    },
+    {
+      "id": "sting",
+      "name": "StingChat",
+      "type": "K–12 LibreChat fork",
+      "url": "https://github.com/pattersc07/StingChat",
+      "evidence": "https://github.com/pattersc07/StingChat/commit/e3288870cc4f37e0643117305b8bb549544d17ea",
+      "status": "Older rough implementation",
+      "finding": "The June 30, 2025 commit adds teacher-tool forms for lessons, quizzes, rubrics, worksheets, and IEPs.",
+      "reuse": "Reference the idea of guided teacher prompts; favor a few ordinary saved helpers in the new scope.",
+      "limit": "Repository last push: 2025-07-07. README largely inherits upstream content. No school deployment, maintenance readiness, or security properties were established. No code was copied.",
+      "license": "MIT"
+    },
+    {
+      "id": "aisa",
+      "name": "AISAchat",
+      "type": "University-affiliated fork",
+      "url": "https://github.com/JohnHeibel/AISAchat",
+      "status": "Historical lead",
+      "finding": "Repository describes LibreChat for the University of Oregon AI Student Association.",
+      "reuse": "A precedent for small institutional customization.",
+      "limit": "Last push: 2024-04-24. Reviewed README and recent commit metadata show configuration changes; no substantial current education platform was verified.",
+      "license": "MIT"
+    },
+    {
+      "id": "stanford",
+      "name": "Stanford AI Playground",
+      "type": "Institutional deployment",
+      "url": "https://uit.stanford.edu/aiplayground/faqs",
+      "status": "Documented service precedent",
+      "finding": "University IT identifies LibreChat as its foundation and documents institutional eligibility and access.",
+      "reuse": "Reference institution-provided access with a familiar general-purpose chat interface.",
+      "limit": "An operational precedent, not a separately verified reusable school fork."
+    },
+    {
+      "id": "brown",
+      "name": "Brown CCV LibreChat",
+      "type": "Institutional deployment",
+      "url": "https://docs.ccv.brown.edu/ai-tools/services/librechat",
+      "status": "Documented service precedent",
+      "finding": "Brown documents university sign-in, model selection, file attachments, and monthly account credits.",
+      "reuse": "Reference simple institution-funded access and a visible allowance.",
+      "limit": "University deployment practices do not establish K–12 suitability or transferable privacy guarantees."
+    }
+  ],
+  "assessment": "Substantial pieces exist already. The useful new work is a school configuration, a selected-context Canvas experience, a small set of education-specific helpers, and clear student-facing guidance. The reviewed sources do not establish a complete, maintained, turnkey high-school edition.",
+  "scope_boundary": "No LMS replacement, grading/submission workflow, shared-folder agent orchestration, live document editor, or multi-agent work board in the pilot. Preserve those earlier ideas in the archive."
+}
