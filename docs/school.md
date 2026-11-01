@@ -4,6 +4,9 @@ The application keeps LibreChat's standard layout, logo, theme, model menu, dial
 file attachments, exports, agents, and permissions. The HTML concept is a reference;
 it is not a second frontend or an editor to port into the application.
 
+The backend ownership, data model and implementation sequence are documented in
+[`backend.md`](backend.md), with existing behavior separated from proposed controls.
+
 Planned Microsoft email and OneDrive/SharePoint access is **read-only**, with no
 email sending or source write-back. The agreed scope, confidentiality requirements,
 and distinction between existing controls and remaining work are in

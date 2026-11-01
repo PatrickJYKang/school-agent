@@ -5,6 +5,9 @@ faculty member. It is a development proposal, not a security certification or an
 email draft. Microsoft access is not configured in the local pilot, and no
 Outlook agent tool has been implemented.
 
+The implementation design, including connection ownership, restricted execution
+and content lifecycle, is in [`backend.md`](backend.md).
+
 ## What the user should be able to do
 
 - Connect their own school account, initially with only the developer admitted
