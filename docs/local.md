@@ -2,6 +2,8 @@
 
 This fork starts from LibreChat `v0.8.9-rc1`, commit
 `8d3da9bbb220a0a96be9330a2e1cbd385fb786d5` (an upstream prerelease).
+The school branch was synchronized with LibreChat `main` on November 1, 2026,
+through `f4154b649efa37e1345ccc517a4d8d1ed2178c82` (Agents SDK 4.2.1).
 The accepted school concept remains in [`concept/`](../concept/index.html).
 The application now includes the focused school pilot described in
 [`school.md`](school.md), using LibreChat's default visual design.
@@ -83,6 +85,22 @@ configuration and selected-context Canvas workflow are implemented. See
 configuration.
 
 ## Verification
+
+The November 1, 2026 upstream synchronization was checked with the pinned local
+toolchain:
+
+- Lockfile installation and the full production frontend/shared-package build passed.
+- TypeScript checks passed for all six affected TypeScript workspaces and the chat
+  package's consumer fixture.
+- 1,228 focused tests passed across 32 suites: school tools, agent/tool wiring,
+  credential and file ownership, school configuration, the Canvas composer and chat
+  components.
+- The local YAML validated with all four school helpers enabled.
+- The isolated startup regression passed using the production build: median LCP
+  3,545.1 ms (limit 4,500), CLS 0.018 (limit 0.1), and TBT 51.0 ms (limit 500).
+  The database latency hook remained enabled at 250 ms per query.
+- The staged upstream changes contained no matches for actual local credentials
+  and no private `.env` or `.local/` paths.
 
 The baseline was checked on October 28, 2026 with the pinned local toolchain:
 
