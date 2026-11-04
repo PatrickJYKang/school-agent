@@ -149,7 +149,8 @@ receives the search query and the institution's credential at its fixed endpoint
 Results include titles, URLs and snippets; reading the source is a separate
 operation. `interface.school.webSearch.safeSearch` defaults to `strict`; result
 count, response size and timeout are configurable. Neither source reading nor
-search adds a browser or terminal. Those remain later integrations.
+search adds browser automation. Terminal execution is available separately through
+the developer-only [Study workspace agent](terminal.md), without these source tools.
 
 ## Institution configuration
 
@@ -310,8 +311,9 @@ Local screenshots, private credentials, and test reports stay under ignored path
 - Brave HTTP behavior, strict SafeSearch, encrypted institutional credentials,
   missing-key behavior and redaction passed tests with the external API mocked.
   A real Brave query is pending the institution key in `.env`; no key was
-  available at verification time. Browser interaction, terminal/filesystem tools,
-  OCR and submission-reading permissions remain outside this increment.
+  available at verification time. Browser interaction, OCR and submission-reading
+  permissions remain outside this increment. The later developer terminal setup
+  and its separate verification are documented in [terminal.md](terminal.md).
 
 ### Canvas tool calling checks
 

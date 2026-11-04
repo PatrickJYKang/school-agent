@@ -1,0 +1,209 @@
+diff --git a/packages/code/src/git-snapshot.ts b/packages/code/src/git-snapshot.ts
+index 7c57bed..c1cb751 100644
+--- a/packages/code/src/git-snapshot.ts
++++ b/packages/code/src/git-snapshot.ts
+@@ -1,9 +1,10 @@
+ import { constants, close, fstat, read } from 'node:fs';
+-import { mkdir, open, opendir, writeFile } from 'node:fs/promises';
++import { mkdir, open, writeFile } from 'node:fs/promises';
+ import { createHash } from 'node:crypto';
+ import { join, resolve } from 'node:path';
+ import { promisify } from 'node:util';
+ import { captureWorkspaceRootIdentity } from './root-identity.js';
++import { directoryEntries } from './root-access.js';
+ import type { WorkspaceRootIdentity } from './root-identity.js';
+
+ const closeFd = promisify(close);
+@@ -131,7 +132,7 @@ async function copyEntry(
+     const metadata = await statFd(fd);
+     if (metadata.isDirectory()) {
+       await mkdir(destination, { recursive: true, mode: 0o700 });
+-      const directory = await opendir(`/dev/fd/${fd}`);
++      const directory = directoryEntries(fd);
+       for await (const entry of directory) {
+         await copyEntry(
+           fd,
+@@ -318,7 +319,7 @@ export class GitSourceSnapshot {
+     });
+     for (const entry of [...this.objects].reverse()) {
+       await withDirectory(entry.identity, async (fd) => {
+-        const directory = await opendir(`/dev/fd/${fd}`);
++        const directory = directoryEntries(fd);
+         for await (const child of directory) {
+           // Object info (notably alternates) never crosses into private staging.
+           if (child.name === 'pack' || /^[a-f0-9]{2}$/.test(child.name)) {
+diff --git a/packages/code/src/native-scratch.ts b/packages/code/src/native-scratch.ts
+index 8394c1a..f73ce2b 100644
+--- a/packages/code/src/native-scratch.ts
++++ b/packages/code/src/native-scratch.ts
+@@ -1,10 +1,10 @@
+ import { constants as fsConstants } from 'node:fs';
+-import { opendir } from 'node:fs/promises';
+ import type { FileHandle } from 'node:fs/promises';
+
+ import koffi from 'koffi';
+
+ import { removePrivateStorageAcl } from './private-storage.js';
++import { directoryEntries } from './root-access.js';
+
+ const POSIX_PLATFORMS = new Set<NodeJS.Platform>(['darwin', 'linux']);
+ const lib = POSIX_PLATFORMS.has(process.platform) ? koffi.load(null) : undefined;
+@@ -34,10 +34,6 @@ export interface ScratchTraversalHooks {
+   afterEntryInspected?(directoryFd: number, name: string): Promise<void>;
+ }
+
+-function descriptorPath(fd: number): string {
+-  return process.platform === 'linux' ? `/proc/self/fd/${fd}` : `/dev/fd/${fd}`;
+-}
+-
+ function requirePosixBindings(): void {
+   if (!openat || !closeFd || !fchmod || !fchmodat) {
+     throw new Error('Descriptor-relative scratch cleanup is unavailable');
+@@ -150,11 +146,7 @@ export async function restoreScratchTraversal(
+         );
+     if (directoryFd === undefined) continue;
+     try {
+-      const directory = await opendir(descriptorPath(directoryFd));
+-      try {
+-        while (true) {
+-          const entry = await directory.read();
+-          if (entry === null) break;
++      for await (const entry of directoryEntries(directoryFd, MAX_SCRATCH_ENTRIES)) {
+           entriesInspected += 1;
+           if (entriesInspected > MAX_SCRATCH_ENTRIES) {
+             throw new Error('Native sandbox scratch cleanup exceeded its entry limit');
+@@ -167,9 +159,6 @@ export async function restoreScratchTraversal(
+             throw new Error('Native sandbox scratch cleanup exceeded its directory limit');
+           }
+           pending.push([...components, entry.name]);
+-        }
+-      } finally {
+-        await directory.close();
+       }
+     } finally {
+       if (directoryFd !== root.fd) closeDirectory(directoryFd);
+diff --git a/packages/code/src/root-access.test.ts b/packages/code/src/root-access.test.ts
+index bb75746..5b741c6 100644
+--- a/packages/code/src/root-access.test.ts
++++ b/packages/code/src/root-access.test.ts
+@@ -15,10 +15,29 @@ import {
+     link,
+     unlink,
+     spawn,
++    readdir,
+ } from './root-access.js';
+ import { LocalWorkspaceTools } from './workspace.js';
+ import type { WorkspaceToolRequest } from './protocol.js';
+
++test('descriptor enumeration retains a renamed root, Unicode names and entry limits', async t => {
++    const root = await fs.realpath(await fs.mkdtemp(join(tmpdir(), 'root-enumeration-')));
++    const moved = `${root}.old`;
++    t.after(async () => {
++        await fs.rm(root, { recursive: true, force: true });
++        await fs.rm(moved, { recursive: true, force: true });
++    });
++    await fs.writeFile(join(root, 'résumé.md'), 'original');
++    const identity = await fs.stat(root, { bigint: true });
++    await withWorkspaceRoot(root, { path: root, dev: String(identity.dev), ino: String(identity.ino) }, async () => {
++        await fs.rename(root, moved);
++        await fs.mkdir(root);
++        await fs.writeFile(join(root, 'replacement'), 'outside');
++        assert.deepEqual(await readdir(root), ['résumé.md']);
++        await assert.rejects(readdir(root, 0), /maxFiles/);
++    });
++});
++
+ test('search-only directories support known files and command cwd without enumeration', async t => {
+     if (process.getuid?.() === 0)
+         return t.skip(
+diff --git a/packages/code/src/root-access.ts b/packages/code/src/root-access.ts
+index 2f049bc..8c73d03 100644
+--- a/packages/code/src/root-access.ts
++++ b/packages/code/src/root-access.ts
+@@ -19,12 +19,19 @@ import type {
+ import type { WorkspaceRootIdentity } from './root-identity.js';
+
+ type NativeCall = (...args: (string | number | Buffer)[]) => number;
++type NativePointer = object | bigint;
+ interface NativeLibrary {
++    func(signature: 'void *fdopendir(int fd)'): (fd: number) => NativePointer | null;
++    func(name: 'readdir' | 'readdir$INODE64', result: 'void *', args: ['void *']): (dir: NativePointer) => NativePointer | null;
++    func(signature: 'int closedir(void *dir)'): (dir: NativePointer) => number;
+     func(signature: string): NativeCall;
+ }
+ interface NativeRuntime {
+     load(path: null): NativeLibrary;
+-    errno(): number;
++    errno(value?: number): number;
++    decode(pointer: NativePointer, offset: number, type: 'char', length: number): string;
++    decode(pointer: NativePointer, offset: number, type: 'uint16_t'): number;
++    decode(pointer: NativePointer, offset: number, type: 'uint8_t'): number;
+     os: { errno: Record<string, number> };
+ }
+ let nativeRuntime: NativeRuntime | undefined;
+@@ -499,12 +506,64 @@ export const unlink = async (path: string): Promise<void> => {
+ };
+
+ /** Enumeration and entry mutation retain the selected root descriptor. */
++interface DirectoryEntry { name: string; isDirectory(): boolean }
++function readMacOsDirectory(fd: number, maxEntries: number): DirectoryEntry[] {
++    const lib = runtime().load(null);
++    const fdopendir = lib.func('void *fdopendir(int fd)');
++    const next = lib.func(process.arch === 'arm64' ? 'readdir' : 'readdir$INODE64', 'void *', ['void *']);
++    const close = lib.func('int closedir(void *dir)');
++    // Darwin cannot enumerate a directory through /dev/fd. Open relative to
++    // the held descriptor; fdopendir owns this new descriptor on success.
++    const duplicate = checked(openAt!(fd, '.', constants.O_RDONLY | constants.O_DIRECTORY | constants.O_NOFOLLOW, 0));
++    const directory = fdopendir(duplicate);
++    if (directory == null) {
++        const error = nativeError();
++        closeSync(duplicate);
++        throw error;
++    }
++    try {
++        const entries: DirectoryEntry[] = [];
++        while (true) {
++            runtime().errno(0);
++            const entry = next(directory);
++            if (entry == null) {
++                if (runtime().errno() !== 0) throw nativeError();
++                return entries;
++            }
++            // Darwin's inode64 dirent has d_namlen at 18 and d_name at 21.
++            const length = runtime().decode(entry, 18, 'uint16_t');
++            if (length < 1 || length > 1023) throw new Error('Invalid directory entry');
++            const name = runtime().decode(entry, 21, 'char', length);
++            if (name === '.' || name === '..') continue;
++            if (entries.length >= maxEntries) throw new Error('Dependency directory exceeds maxFiles');
++            const type = runtime().decode(entry, 20, 'uint8_t');
++            entries.push({ name, isDirectory: () => type === 4 });
++        }
++    } finally {
++        close(directory);
++    }
++}
++
++/** Enumerate an already-held directory without reopening its replaceable pathname. */
++export async function* directoryEntries(fd: number, maxEntries = 200_000): AsyncGenerator<DirectoryEntry> {
++    if (process.platform === 'darwin') {
++        yield* readMacOsDirectory(fd, maxEntries);
++        return;
++    }
++    const directory = await fs.opendir(descriptorPath(fd));
++    let count = 0;
++    for await (const entry of directory) {
++        if (count++ >= maxEntries) throw new Error('Dependency directory exceeds maxFiles');
++        yield entry;
++    }
++}
++
+ export const readdir = async (path: string, maxEntries = 200_000): Promise<string[]> => {
+     const access = context.getStore();
+     const handle = access ? await access.openFile(path, constants.O_RDONLY | constants.O_DIRECTORY | constants.O_NOFOLLOW) : undefined;
+     try {
+         const entries: string[] = [];
+-        const directory = await fs.opendir(handle ? descriptorPath(handle.fd) : path);
++        const directory = handle ? directoryEntries(handle.fd, maxEntries) : await fs.opendir(path);
+         for await (const entry of directory) {
+             if (entries.length >= maxEntries) throw new Error('Dependency directory exceeds maxFiles');
+             entries.push(entry.name);

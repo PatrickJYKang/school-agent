@@ -9,6 +9,7 @@ const {
   contentFilterBlockResponse,
   getReasoningCapabilities,
   applyRequestReasoningOverride,
+  shouldEnforceModelSpec,
 } = require('@librechat/api');
 const { logger } = require('@librechat/data-schemas');
 const {
@@ -89,7 +90,14 @@ async function buildEndpointOption(req, res, next) {
   const appConfig = req.config;
   let appliedModelSpecPrivateFields = new Set();
   let enforcedModelSpecFields = new Set();
-  if (appConfig.modelSpecs?.list?.length && appConfig.modelSpecs?.enforce) {
+  if (
+    shouldEnforceModelSpec({
+      modelSpecs: appConfig.modelSpecs,
+      endpoint,
+      agentId: req.body.agent_id,
+      spec: parsedBody.spec ?? req.body.spec,
+    })
+  ) {
     /** @type {{ list: TModelSpec[] }}*/
     const { list } = appConfig.modelSpecs;
     const rawSpec = req.body.spec;

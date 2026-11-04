@@ -1,0 +1,136 @@
+# Optional local execution stack. Source is pinned in config/terminal.json.
+# Student commands run in the separate native SRT worker, not these control services.
+name: school-agent-terminal
+
+x-service: &service
+  restart: unless-stopped
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  networks: [terminal]
+  depends_on:
+    redis:
+      condition: service_healthy
+
+services:
+  api:
+    <<: *service
+    networks: [terminal, control]
+    env_file: .local/terminal/api.env
+    build:
+      context: .local/code-interpreter
+      dockerfile: service/Dockerfile
+      target: api
+    ports: ['127.0.0.1:3112:3112']
+    environment:
+      SERVICE_PORT: '3112'
+      SERVICE_NAME: study-code-api
+    healthcheck:
+      test:
+        [
+          CMD,
+          bun,
+          -e,
+          "fetch('http://localhost:3112/v1/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  queue:
+    <<: *service
+    env_file: .local/terminal/queue.env
+    build:
+      context: .local/code-interpreter
+      dockerfile: service/Dockerfile
+      target: worker
+    environment:
+      WORKER_HEALTH_PORT: '3113'
+      SERVICE_NAME: study-code-queue
+    healthcheck:
+      test:
+        [
+          CMD,
+          bun,
+          -e,
+          "fetch('http://localhost:3113/ready').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  files:
+    <<: *service
+    env_file: .local/terminal/files.env
+    build:
+      context: .local/code-interpreter
+      dockerfile: service/Dockerfile
+      target: production
+    environment:
+      FILE_SERVER_PORT: '3000'
+      SERVICE_NAME: study-code-files
+    depends_on:
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_started
+
+  egress:
+    <<: *service
+    networks: [terminal, control]
+    env_file: .local/terminal/egress.env
+    build:
+      context: .local/code-interpreter
+      dockerfile: service/Dockerfile
+      target: egress-gateway
+    ports: ['127.0.0.1:3190:3190']
+    environment:
+      SERVICE_NAME: study-code-relay
+
+  tools:
+    <<: *service
+    env_file: .local/terminal/tools.env
+    build:
+      context: .local/code-interpreter
+      dockerfile: service/Dockerfile.tool-call-server
+      target: production
+    environment:
+      TOOL_CALL_SERVER_PORT: '3033'
+      SERVICE_NAME: study-code-callbacks
+
+  redis:
+    image: redis:7.4.2-alpine
+    env_file: .local/terminal/redis.env
+    command:
+      [
+        sh,
+        -c,
+        'exec redis-server --requirepass "$$REDIS_PASSWORD" --appendonly yes --maxmemory-policy noeviction',
+      ]
+    restart: unless-stopped
+    volumes: [redis:/data]
+    networks: [terminal]
+    healthcheck:
+      test: [CMD-SHELL, 'REDISCLI_AUTH="$$REDIS_PASSWORD" redis-cli ping | grep -q PONG']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  minio:
+    image: school-agent-minio:study
+    build:
+      context: config/terminal
+      dockerfile: minio.Dockerfile
+    env_file: .local/terminal/minio.env
+    command: [server, /data]
+    restart: unless-stopped
+    volumes: [files:/data]
+    networks: [terminal]
+
+networks:
+  terminal:
+    internal: true
+  control:
+
+volumes:
+  redis:
+  files:

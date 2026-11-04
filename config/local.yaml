@@ -26,6 +26,7 @@ interface:
   parameters: false
   presets: true
   memories: false
+  runCode: true
   sharedLinks:
     create: false
     share: false
@@ -45,6 +46,55 @@ interface:
 # These are application allowances, not a spending limit at the model provider.
 webSearch:
   braveApiKey: ${BRAVE_SEARCH_API_KEY}
+
+# Native execution is used by the separately installed Study workspace agent.
+# Ordinary school helper presets keep their current tools.
+endpoints:
+  agents:
+    capabilities:
+      - deferred_tools
+      - execute_code
+      - file_search
+      - web_search
+      - artifacts
+      - subagents
+      - actions
+      - context
+      - skills
+      - memory
+      - ask_user_question
+      - tools
+      - ocr
+      - stateful_code_sessions
+    toolApproval:
+      enabled: true
+      mode: bypass
+      ask: [bash_tool, write_file, edit_file]
+    statefulCodeSessions:
+      allowedEnvironments: [conversation]
+      principalWorkers:
+        enabled: false
+      environments:
+        - id: school-terminal
+          name: Study workspace
+          type: attached
+          baseURL: http://127.0.0.1:3112/v1
+          default: true
+          owner: deployment
+          pairing:
+            workerId: school-study-worker
+            tokenEnv: SCHOOL_TERMINAL_BRIDGE_TOKEN
+          configSchema:
+            limits:
+              maxCommandTimeoutMs: 30000
+              defaultCommandTimeoutMs: 10000
+            permissions:
+              fileWrite:
+                allowed: [ask, deny]
+                default: ask
+              commandExecution:
+                allowed: [ask, deny]
+                default: ask
 
 balance:
   enabled: true

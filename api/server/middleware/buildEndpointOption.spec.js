@@ -781,6 +781,61 @@ describe('buildEndpointOption - defaultParamsEndpoint parsing', () => {
   });
 });
 
+describe('buildEndpointOption - explicitly admitted saved agents', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockGetEndpointsConfig.mockResolvedValue({});
+  });
+
+  const request = (addedEndpoints) => {
+    const req = createReq(
+      { endpoint: EModelEndpoint.agents, agent_id: 'agent_study', model: 'school-model' },
+      {
+        modelSpecs: {
+          enforce: true,
+          addedEndpoints,
+          list: [{ name: 'study', preset: { endpoint: EModelEndpoint.openAI } }],
+        },
+      },
+    );
+    req.baseUrl = '/api/agents/chat';
+    req.user = { id: 'local-user' };
+    return req;
+  };
+
+  it('builds options for an explicitly admitted saved agent without requiring a school preset', async () => {
+    const req = request([EModelEndpoint.agents]);
+    const next = jest.fn();
+    await buildEndpointOption(req, createRes(), next);
+    expect(require('@librechat/api').handleError).not.toHaveBeenCalled();
+    expect(mockAgentBuildOptions).toHaveBeenCalled();
+    expect(req.body.endpointOption.agent_id).toBe('agent_study');
+    expect(next).toHaveBeenCalledTimes(1);
+  });
+
+  it('continues requiring a specification when the saved-agent endpoint was not admitted', async () => {
+    const res = createRes();
+    const next = jest.fn();
+    await buildEndpointOption(request([]), res, next);
+    expect(require('@librechat/api').handleError).toHaveBeenCalledWith(res, {
+      text: 'No model spec selected',
+    });
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it('continues rejecting a supplied invalid specification on an admitted saved agent', async () => {
+    const req = request([EModelEndpoint.agents]);
+    req.body.spec = 'unknown';
+    const res = createRes();
+    const next = jest.fn();
+    await buildEndpointOption(req, res, next);
+    expect(require('@librechat/api').handleError).toHaveBeenCalledWith(res, {
+      text: 'Invalid model spec',
+    });
+    expect(next).not.toHaveBeenCalled();
+  });
+});
+
 describe('buildEndpointOption - enforced server continuations', () => {
   const {
     createAgentTriggerExecutionHost,

@@ -84,6 +84,10 @@ configuration and selected-context Canvas workflow are implemented. See
 [`school.md`](school.md) for current features, setup, and remaining institution
 configuration.
 
+An optional local **Study workspace** agent now provides native terminal execution
+and persistent chat files. See [terminal.md](terminal.md) for setup, approval
+controls, startup commands and the limits of a personal-machine sandbox.
+
 ## Verification
 
 The November 1, 2026 upstream synchronization was checked with the pinned local

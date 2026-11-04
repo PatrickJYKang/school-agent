@@ -1,4 +1,5 @@
 export * from './service';
+export * from './specs';
 export * from './allowlist';
 export * from './rebinding';
 export * from './overrides';

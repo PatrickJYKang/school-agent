@@ -1,0 +1,12 @@
+{
+  "repository": "https://github.com/LibreChat-AI/code-interpreter.git",
+  "revision": "a3207a75c8327ba1c9526eff8b06f3588f3739ed",
+  "license": "Apache-2.0",
+  "patches": ["config/terminal/macos.patch"],
+  "environmentId": "school-terminal",
+  "workerId": "school-study-worker",
+  "workspaceId": "study",
+  "apiUrl": "http://127.0.0.1:3112/v1",
+  "relayUrl": "http://127.0.0.1:3190",
+  "agentName": "Study workspace"
+}
