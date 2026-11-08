@@ -5,6 +5,10 @@ create Markdown working files through LibreChat's existing code tools and approv
 cards. Each chat receives a separate persistent checkout. This is a development
 setup on the operator's machine, not a school deployment boundary.
 
+The school target is now [server-side Python execution](execution.md), with
+disposable guests and app-owned files. This native terminal remains a developer
+demonstration; local student machine access is a separately deferred capability.
+
 ## Setup and daily use
 
 Start the local app as described in [local.md](local.md), using Node 24.22.1 and

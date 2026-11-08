@@ -26,6 +26,11 @@ for the agreed read-only scope and IT discussion.
 - Markdown is the intended working-document format; PDF and Word remain sources.
   No mandatory relationship between a working document and an original, no Word
   editor and no new collaborative-document subsystem.
+- The November 8 execution decision is [Python on isolated school infrastructure](execution.md).
+  Student-machine commands and filesystem agents are deferred separately. The
+  [browser options](browser.md) recommend a separate hosted research browser
+  first, with selected local tabs as a possible later mode. These are designs,
+  not deployed school capabilities.
 
 ## Data model: reuse first
 
@@ -205,14 +210,15 @@ the institution's retention policy and end-to-end deletion verification are pend
 
 ## Implementation sequence and completion evidence
 
-| Stage                          | State and next work                                                                                                                                                                                                                                                |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Current pilot                  | Native helpers, Canvas connection/tools, uploaded-document reading, public fetch/search, school policy controls and existing admin infrastructure are implemented. Brave live search awaits a local key. Microsoft is not connected.                               |
-| Backend foundations            | Implement/test the connection adapter and metadata migration, sensitive conversation profile and server-side provider/tool restrictions; extend existing audit actions. Keep new configuration in the shared config schema and database contracts in data-schemas. |
-| Developer-only Microsoft pilot | Agree hosting, identity, admitted account, permitted sources/model, retention and operator access with IT. Configure delegated read-only access; implement bounded mail/file tools and native connect/disconnect/reconnect entry points. No bulk indexing.         |
-| Broader school pilot           | Validate admission/role policies, permission changes, deletion and operational access with representative accounts before adding students.                                                                                                                         |
-| Local execution study          | The developer-only [Study workspace agent](terminal.md) uses native LibreChat command approval and a local SRT worker. Keep it excluded from future sensitive Microsoft profiles until those restrictions are enforced. It is not a school execution deployment.   |
-| Deferred                       | Browser automation, multi-school hosting, folder orchestration, merging and collaborative editing remain outside this study. Microsoft sending/writing is excluded, not a promised later feature.                                                                  |
+| Stage                          | State and next work                                                                                                                                                                                                                                                               |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Current pilot                  | Native helpers, Canvas connection/tools, uploaded-document reading, public fetch/search, school policy controls and existing admin infrastructure are implemented. Brave live search awaits a local key. Microsoft is not connected.                                              |
+| Backend foundations            | Implement/test the connection adapter and metadata migration, sensitive conversation profile and server-side provider/tool restrictions; extend existing audit actions. Keep new configuration in the shared config schema and database contracts in data-schemas.                |
+| Developer-only Microsoft pilot | Agree hosting, identity, admitted account, permitted sources/model, retention and operator access with IT. Configure delegated read-only access; implement bounded mail/file tools and native connect/disconnect/reconnect entry points. No bulk indexing.                        |
+| Broader school pilot           | Validate admission/role policies, permission changes, deletion and operational access with representative accounts before adding students.                                                                                                                                        |
+| Execution design               | The [server execution plan](execution.md) targets Python in disposable guests on dedicated school infrastructure. The [local terminal](terminal.md) remains a developer demonstration. Keep execution excluded from sensitive Microsoft profiles until restrictions are enforced. |
+| Browser design                 | [Browser options](browser.md) recommend an isolated hosted research browser using Playwright, with optional visual actions and later selected-tab extension access. No browser agent is implemented yet.                                                                          |
+| Deferred                       | Local student machine agents, whole-desktop control, multi-school hosting, folder orchestration, merging and collaborative editing remain outside this study. Microsoft sending/writing is excluded, not a promised later feature.                                                |
 
 Evidence required for the sensitive pilot: a second user cannot use the developer's
 connection or files; model-supplied IDs cannot change ownership; revocation/policy
