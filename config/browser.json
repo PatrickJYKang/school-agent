@@ -1,0 +1,13 @@
+{
+  "mcp": { "package": "@playwright/mcp", "version": "0.0.84", "license": "Apache-2.0" },
+  "proxy": {
+    "repository": "https://github.com/stripe/smokescreen",
+    "revision": "609eb8931420453daf5893509be0b25b21bd9edb",
+    "version": "v0.1.0",
+    "license": "MIT"
+  },
+  "serviceUrl": "http://127.0.0.1:3118",
+  "maxSessions": 2,
+  "maxPausedSessions": 1000,
+  "maxLifetimeMs": 600000
+}

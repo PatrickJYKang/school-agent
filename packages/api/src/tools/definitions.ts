@@ -21,6 +21,7 @@ import type { CodeCapabilityConfigLoader } from '~/code/capabilities';
 import type { MCPToolAlias, ToolDefinition } from './classification';
 import { bindToolApproval, bindToolApprovalIdentity, getToolApprovalIdentity } from './approval';
 import { resolveJsonSchemaRefs, normalizeJsonSchema, sanitizeGeminiSchema } from '~/mcp/zod';
+import { schoolBrowserToolDefinition, schoolBrowserEnabled } from '~/school/browser/tool';
 import { schoolWebToolDefinition, schoolWebToolsEnabled } from '~/school/web/tool';
 import { canvasToolDefinition, schoolCanvasToolsEnabled } from '~/school/tools';
 import { schoolDocumentsEnabled } from '~/school/documents/policy';
@@ -194,6 +195,11 @@ export async function loadToolDefinitions(
   let resolvedMCPToolCount = 0;
 
   for (const toolName of tools) {
+    if (toolName === schoolBrowserToolDefinition.name) {
+      if (schoolBrowserEnabled(params.school, params))
+        builtInToolDefs.push(schoolBrowserToolDefinition);
+      continue;
+    }
     if (toolName === schoolWebToolDefinition.name) {
       if (schoolWebToolsEnabled(params.school, params))
         builtInToolDefs.push(schoolWebToolDefinition);

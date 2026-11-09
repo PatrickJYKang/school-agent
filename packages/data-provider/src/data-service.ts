@@ -17,6 +17,7 @@ import type {
 import type { TInsightsAccessResponse, TInsightsParams, TInsightsResponse } from './types/insights';
 import type { ScheduleMCPConsentView, ConfirmScheduleMCPConsent } from './types/scheduleConsent';
 import type { CodeSetupAttempt, CodeSetupApprovalRequest } from './codeSetup';
+import type { SchoolBrowserState } from './browser';
 import type { TFileConfig } from './file-config';
 import type * as tl from './types/tools';
 import type * as t from './types';
@@ -39,6 +40,12 @@ import * as config from './config';
 import request from './request';
 
 export const getSchoolStatus = (): Promise<SchoolStatus> => request.get(endpoints.school());
+export const getSchoolBrowser = (conversationId: string): Promise<SchoolBrowserState> =>
+  request.get(endpoints.school(`/browser/${encodeURIComponent(conversationId)}`));
+export const stopSchoolBrowser = (conversationId: string): Promise<SchoolBrowserState> =>
+  request.delete(endpoints.school(`/browser/${encodeURIComponent(conversationId)}`));
+export const restartSchoolBrowser = (conversationId: string): Promise<SchoolBrowserState> =>
+  request.post(endpoints.school(`/browser/${encodeURIComponent(conversationId)}`), {});
 export const connectSchoolCanvas = (token: string): Promise<{ connected: boolean }> =>
   request.put(endpoints.school('/canvas/connection'), { token });
 export const disconnectSchoolCanvas = (): Promise<void> =>

@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "@playwright/mcp": "0.0.84",
+    "esbuild": "0.25.12",
+    "zod": "4.6.7"
+  },
+  "private": true,
+  "name": "school-browser-runtime",
+  "overrides": {
+    "@hono/node-server": "2.1.3"
+  }
+}

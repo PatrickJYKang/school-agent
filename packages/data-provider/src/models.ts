@@ -55,6 +55,7 @@ export type TModelSpec = {
   canvas?: boolean;
   documents?: boolean;
   schoolWeb?: boolean;
+  schoolBrowser?: boolean;
   fileSearch?: boolean;
   executeCode?: boolean;
   memory?: boolean;
@@ -205,6 +206,7 @@ export const tModelSpecSchema = z.object({
   canvas: z.boolean().optional(),
   documents: z.boolean().optional(),
   schoolWeb: z.boolean().optional(),
+  schoolBrowser: z.boolean().optional(),
   runInBackground: z.union([z.boolean(), z.array(z.string())]).optional(),
   describeIntent: z.union([z.boolean(), z.array(z.string())]).optional(),
   artifacts: z.union([z.string(), z.boolean()]).optional(),

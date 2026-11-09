@@ -28,6 +28,7 @@ import type { ExtendedFile, FileSetter } from '~/common';
 import { useSchoolQuery, useCanvasCourses, useCanvasMaterials } from '~/data-provider/School';
 import { useFileHandlingNoChatContext } from '~/hooks/Files';
 import { useLocalize } from '~/hooks';
+import SchoolBrowser from './Browser';
 
 const errorKey = (error: unknown): `com_school_${CanvasErrorCode}` => {
   const code = (error as { response?: { data?: { code?: string } } })?.response?.data?.code;
@@ -144,6 +145,7 @@ export default function SchoolCanvas({
   return (
     <>
       <div className="flex flex-wrap items-center gap-1 px-3 pt-2">
+        <SchoolBrowser index={index} conversationId={conversation?.conversationId} />
         {school.canvas.enabled && (
           <Button
             type="button"

@@ -38,6 +38,8 @@ explicitly declares one backend process (`SCHEDULES_SINGLE_PROCESS=true`); do no
 reuse that assertion for a deployment with multiple replicas. Search and the RAG/file
 indexing service are not started here. Plain-text/Markdown context uses the native
 file-processing path. The admin panel is started separately with `node scripts/admin.mjs`.
+The public School browser uses `node scripts/browser.mjs setup`; see its
+[scope, audit and operating notes](browser-audit.md).
 
 ## Optional project-local toolchain
 

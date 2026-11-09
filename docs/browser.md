@@ -1,10 +1,11 @@
 # Browser use architecture options
 
-Recommendation for discussion, November 8, 2026. Start with an institution-hosted
-browser for public research and interactive websites. Use Playwright for page
-structure and actions, with screenshots available for visual interpretation.
-Keep a later connection to a student's selected local tabs as a distinct mode.
-Whole-desktop control is outside the initial study.
+Implementation update, November 8, 2026. The local School browser uses pinned
+Playwright MCP for public rendered-page reading, observed-link navigation, back
+navigation and screenshots. It uses native LibreChat activity/image delivery and
+a status/preview dialog with Stop and explicit restart. See the
+[scoped audit and operating guide](browser-audit.md) for setup and deployment
+limits. Local student tabs and whole-desktop control remain future capabilities.
 
 ## Separate where the browser runs from how it is controlled
 
@@ -57,12 +58,13 @@ origin filters are documented as convenience controls, not a security boundary.
 Keep institution domain policy and per-task access distinct: the student cannot
 authorize a site that the institution has disabled.
 
-Start with public sites without saved account sessions. Downloads enter a
-bounded quarantine and the existing file pipeline. Transfers of working files
-into a browser are explicit, authorized attachments; do not mount the Python
-workspace into a network-enabled browser. No remote debugging endpoint is
-publicly exposed. Apply step/time limits, cancellation and idle teardown, and
-verify final page state before reporting success.
+The implemented surface uses public sites without saved account sessions.
+Downloads are cancelled, mutating HTTP methods and WebSockets are blocked, and
+popups are closed. There are no model-facing typing, arbitrary click, script,
+upload, cookie or debugging operations. Common credential-bearing URLs and the
+configured school/account hosts are denied. Future permitted downloads must use
+owned File storage. Do not mount the Python workspace into this network-enabled
+browser. Bound runs, support cancellation and verify final page state.
 
 Sign-in is a later addition to hosted browsing. It needs a user-controlled login
 handoff, per-user encrypted session handling, disconnect/deletion and provider

@@ -1,0 +1,13 @@
+version: v1
+services: []
+default:
+  project: school-browser
+  action: open
+global_deny_list:
+  - '*.instructure.com'
+  - '*.office.com'
+  - '*.office365.com'
+  - '*.sharepoint.com'
+  - login.microsoftonline.com
+  - outlook.live.com
+  - accounts.google.com

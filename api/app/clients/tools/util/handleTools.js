@@ -35,6 +35,8 @@ const {
   createCanvasTool,
   createSchoolDocumentTool,
   createSchoolWebTool,
+  createSchoolBrowserTool,
+  createSchoolBrowserClient,
   createSchoolDocumentTransport,
   readSchoolDocument,
   resolveDownloadPath,
@@ -176,6 +178,24 @@ const loadTools = async ({
   };
 
   const customConstructors = {
+    school_browser: () =>
+      createSchoolBrowserTool({
+        user: options.req?.user,
+        conversationId: options.req?.body?.conversationId,
+        signal,
+        deps: {
+          getAppConfig,
+          createClient: (settings) =>
+            createSchoolBrowserClient({
+              settings,
+              token: process.env[settings.tokenEnv],
+              user: options.req?.user,
+              conversationId: options.req?.body?.conversationId,
+              fetchFn: fetch,
+              signal,
+            }),
+        },
+      }),
     web: () =>
       createSchoolWebTool({
         user: options.req?.user,

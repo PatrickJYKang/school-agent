@@ -4,7 +4,9 @@ import { logger } from '@librechat/data-schemas';
 import { canvasContextRequestSchema, resolveSchoolConfig } from 'librechat-data-provider';
 import type { SchoolConfig, SchoolStatus } from 'librechat-data-provider';
 import type { Request, Response, RequestHandler, Router } from 'express';
+import type { SchoolBrowserSettings } from 'librechat-data-provider';
 import type { AppConfig } from '@librechat/data-schemas';
+import type { BrowserTransport } from './browser/client';
 import type { GetAppConfigOptions } from '~/app/service';
 import type { ServerRequest } from '~/types';
 import type { CanvasFetch } from './canvas';
@@ -15,8 +17,14 @@ import {
 } from './connection';
 import { CanvasError, canvasOrigin, createCanvasClient } from './canvas';
 import { getAppConfigOptionsFromUser } from '~/app/service';
+import { schoolBrowserEnabled } from './browser/tool';
 
 export type SchoolDependencies = {
+  createBrowserClient?: (input: {
+    user: { id: string; tenantId?: string };
+    conversationId: string;
+    settings: SchoolBrowserSettings;
+  }) => BrowserTransport;
   getAppConfig: (options: GetAppConfigOptions) => Promise<AppConfig>;
   requireJwtAuth: RequestHandler;
   fetchFn: CanvasFetch;
@@ -88,7 +96,7 @@ export function createSchoolRouter(deps: SchoolDependencies): Router {
     };
   }
   async function status(req: Request): Promise<SchoolStatus> {
-    const { userId, school } = await access(req);
+    const { userId, school, config } = await access(req);
     if (!school?.enabled)
       return {
         enabled: false,
@@ -104,6 +112,7 @@ export function createSchoolRouter(deps: SchoolDependencies): Router {
       enabled: true,
       name: school.name,
       guidance: school.guidance,
+      browser: { enabled: schoolBrowserEnabled(school, config) },
       canvas: {
         enabled: school.canvas.enabled,
         toolCalling: school.canvas.toolCalling,
@@ -119,6 +128,45 @@ export function createSchoolRouter(deps: SchoolDependencies): Router {
       res.json(await status(req));
     }),
   );
+  for (const method of ['get', 'delete', 'post'] as const) {
+    router[method](
+      '/browser/:conversationId',
+      handler(async (req, res) => {
+        const user = (req as ServerRequest).user;
+        const conversationId = z
+          .string()
+          .regex(/^[a-zA-Z0-9_-]{8,128}$/)
+          .safeParse(req.params.conversationId);
+        if (!user?.id || !conversationId.success) {
+          res.status(400).json({ code: 'browser_invalid_request' });
+          return;
+        }
+        const { school, config } = await access(req);
+        if (!school || !schoolBrowserEnabled(config.interfaceConfig?.school, config)) {
+          res.status(403).json({ code: 'browser_disabled' });
+          return;
+        }
+        if (!deps.createBrowserClient) {
+          res.status(503).json({ code: 'browser_unconfigured' });
+          return;
+        }
+        const client = deps.createBrowserClient({
+          user,
+          conversationId: conversationId.data,
+          settings: school.browser,
+        });
+        let control: 'stop' | 'restart' | undefined;
+        if (method === 'delete') control = 'stop';
+        if (method === 'post') control = 'restart';
+        const result = await client.request(undefined, control);
+        if (!result.ok) {
+          res.status(503).json({ code: result.error.code });
+          return;
+        }
+        res.set('Cache-Control', 'no-store').json(result.value);
+      }),
+    );
+  }
   router.put(
     '/canvas/connection',
     handler(async (req, res) => {

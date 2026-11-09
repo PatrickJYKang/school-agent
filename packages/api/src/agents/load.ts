@@ -10,6 +10,7 @@ import {
   CANVAS_TOOL_NAME,
   DOCUMENT_TOOL_NAME,
   SCHOOL_WEB_TOOL_NAME,
+  SCHOOL_BROWSER_TOOL_NAME,
 } from 'librechat-data-provider';
 import type {
   AgentModelParameters,
@@ -116,6 +117,7 @@ export async function loadEphemeralAgent(
   const tools: string[] = [];
   if (modelSpec?.documents === true) tools.push(DOCUMENT_TOOL_NAME);
   if (modelSpec?.schoolWeb === true) tools.push(SCHOOL_WEB_TOOL_NAME);
+  if (modelSpec?.schoolBrowser === true) tools.push(SCHOOL_BROWSER_TOOL_NAME);
   if (modelSpec?.canvas === true) {
     tools.push(CANVAS_TOOL_NAME);
   }

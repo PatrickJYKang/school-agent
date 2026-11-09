@@ -1,5 +1,6 @@
 export enum QueryKeys {
   school = 'school',
+  schoolBrowser = 'schoolBrowser',
   canvasCourses = 'canvasCourses',
   canvasMaterials = 'canvasMaterials',
   messages = 'messages',
@@ -140,6 +141,7 @@ export const DynamicQueryKeys = {
 } as const;
 
 export enum MutationKeys {
+  controlSchoolBrowser = 'controlSchoolBrowser',
   connectSchoolCanvas = 'connectSchoolCanvas',
   disconnectSchoolCanvas = 'disconnectSchoolCanvas',
   prepareCanvasContext = 'prepareCanvasContext',
