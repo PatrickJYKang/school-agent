@@ -1,4 +1,11 @@
-# School pilot
+# School study implementation
+
+The [current scope and priorities](scope.md), updated November 23, 2026, focus
+this WebbGPT replacement candidate on assignment/study help, reading/revision
+and bounded data/research work. The next development work is a complete Canvas
+assignment experience, visible assistance guidance, inspectable evidence and
+student control. Proposed study features and model choice are listed separately
+from the working capabilities below.
 
 The application keeps LibreChat's standard layout, logo, theme, model menu, dialogs,
 file attachments, exports, agents, and permissions. The HTML concept is a reference;
@@ -7,10 +14,11 @@ it is not a second frontend or an editor to port into the application.
 The backend ownership, data model and implementation sequence are documented in
 [`backend.md`](backend.md), with existing behavior separated from proposed controls.
 
-Planned Microsoft email and OneDrive/SharePoint access is **read-only**, with no
-email sending or source write-back. The agreed scope, confidentiality requirements,
-and distinction between existing controls and remaining work are in
-[`microsoft.md`](microsoft.md). Microsoft is not connected in this pilot yet.
+Selected OneDrive/SharePoint files are a possible subsequent integration when a
+study activity needs them. Microsoft email access is deferred. Any future
+Microsoft access remains **read-only**, with no sending or source write-back;
+[`microsoft.md`](microsoft.md) retains the access and confidentiality requirements.
+Microsoft is not connected in the local study.
 
 ## Working features
 
@@ -25,6 +33,9 @@ and distinction between existing controls and remaining work are in
   both Canvas file IDs and external link destinations instead of dropping URLs.
 - Public URL reading and Brave web search through the native `web` tool. Search
   uses the institution's credential; the helpers are equipped automatically.
+- A separate public School browser helper can read rendered pages, follow observed
+  links and show screenshots. Its native status dialog provides Stop/restart.
+  See [deployment limits](browser-audit.md) before school use.
 - A Canvas material picker in the composer. Select a course, assignments/rubrics,
   or course pages; preview the selected text; attach it as `canvas-context.md`.
 - Native attachment removal and conversation/message Markdown export. Attaching
@@ -36,7 +47,7 @@ and distinction between existing controls and remaining work are in
   Its create-user form is still an upstream stub; use school SSO, invitations,
   or LibreChat's existing `create-user` command for account provisioning.
 
-The included configuration is a **local pilot**, not a completed institution
+The included configuration is a **local study**, not a completed institution
 deployment. Native agents remain available through My Agents. Publishing helpers
 and prompts is off by default; an administrator can enable it for an educator
 role/group through configuration profiles and grant the appropriate resource access.

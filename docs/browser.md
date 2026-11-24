@@ -7,6 +7,11 @@ a status/preview dialog with Stop and explicit restart. See the
 [scoped audit and operating guide](browser-audit.md) for setup and deployment
 limits. Local student tabs and whole-desktop control remain future capabilities.
 
+The November 23 [scope and priorities](scope.md) retain this capability for
+specific reading/research activities. The next work is evidence, control and
+deployment validation in those activities, rather than expanding to sign-in,
+arbitrary interactions or local-tab access.
+
 ## Separate where the browser runs from how it is controlled
 
 Playwright, an extension and computer use answer different questions and can be

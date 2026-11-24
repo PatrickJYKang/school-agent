@@ -51,6 +51,17 @@
   </a>
 </p>
 
+## Webb school study
+
+This fork is a candidate for WebbGPT's next version. The current study focuses on
+assignment help, reading/revision and bounded data/research work, with visible
+assistance guidance, student control and inspectable sources and tool results.
+
+Start with the [scope and priorities](docs/scope.md), the
+[Webb context and student reflections](docs/devdocs/2026-11-23-webb.md), and the
+[implemented prototype](docs/school.md). [Local setup](docs/local.md) is for
+development; school deployment and study participation need separate preparation.
+
 ## 🚀 What's New in v0.8.8
 
 - **Agent Management API (beta):** Create, discover, update, and delete Agents; manage Agent files and Skills; and authenticate machine clients through deployment-bound OIDC identities while preserving existing role and Agent access controls. Public OpenAPI and Swagger UI cover inference, events, Agent management, and Skill management.

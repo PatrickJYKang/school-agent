@@ -5,8 +5,10 @@ This fork starts from LibreChat `v0.8.9-rc1`, commit
 The school branch was synchronized with LibreChat `main` on November 1, 2026,
 through `f4154b649efa37e1345ccc517a4d8d1ed2178c82` (Agents SDK 4.2.1).
 The accepted school concept remains in [`concept/`](../concept/index.html).
-The application now includes the focused school pilot described in
+The application now includes the focused school study described in
 [`school.md`](school.md), using LibreChat's default visual design.
+The [current scope and priorities](scope.md) guide development and study work;
+local setup does not complete the school deployment requirements.
 
 ## First setup
 

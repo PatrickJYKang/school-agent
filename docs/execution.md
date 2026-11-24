@@ -3,6 +3,11 @@
 Decision recorded November 8, 2026. This is the intended school execution design;
 the existing [local terminal setup](terminal.md) is a developer demonstration.
 
+The November 23 [scope and priorities](scope.md) place execution within a selected
+data/research activity. Develop the student-facing input, code, output and Stop
+experience around that activity; the first study does not require a general
+student terminal or a broad language/runtime catalogue.
+
 School users should be able to calculate, analyse supplied data, make plots and
 create working files using Python on institution-controlled infrastructure.
 Student devices supply the chat interface and explicit uploads. They do not run
@@ -148,8 +153,9 @@ backup handling and operator access before students use the service.
 
 ## Implementation order and acceptance
 
-First validate the pinned upstream microVM runner on an isolated Linux host with
-synthetic inputs. Then wire the Python-only tool path, file transfer and native
+Choose one academic task and its admitted inputs with faculty/students. Validate
+the pinned upstream microVM runner on an isolated Linux host with synthetic
+inputs for that task. Then wire the Python-only tool path, file transfer and native
 artifact UI. Keep the local native terminal as an operator development option,
 excluded from student policy. Browser execution is a separate service described
 in [browser.md](browser.md).

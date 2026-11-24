@@ -1,24 +1,27 @@
 {
   "working_title": "Fieldwork",
-  "date": "2026-10-28",
-  "status": "Focused LibreChat fork concept and browser-local HTML prototype. No LibreChat runtime, model, authentication, or connector is installed.",
-  "scope_change": "The current direction is a limited fork/configuration of LibreChat. The earlier independent agent-workspace concept is deferred and preserved.",
+  "date": "2026-11-23",
+  "status": "Working local LibreChat fork with Canvas, document reading, public research tools and a limited browser. The next study focuses on academic activities, visible assistance guidance, student control and inspectable evidence. School deployment remains pending.",
+  "scope_change": "Retain the limited LibreChat fork as a candidate for WebbGPT's next version. Prioritize complete academic activities and evaluation with Webb students/faculty before expanding integrations. Selected Microsoft files are conditional on activity needs; mailbox access and the earlier independent agent-workspace concept are deferred.",
   "deliverables": {
     "pitch": "index.html",
     "mockup": "mockup.html",
     "research": "research.html",
     "references": "references.json",
-    "broader_concept": "archive/2026-10-13-agent-workspace/overview.html"
+    "broader_concept": "archive/2026-10-13-agent-workspace/overview.html",
+    "scope": "../docs/scope.md",
+    "webb_context": "../docs/devdocs/2026-11-23-webb.md",
+    "runtime_status": "../docs/school.md"
   },
   "current_scope": [
-    "Reuse LibreChat chat, agents, tool use, attachments, exports, authentication, and access controls.",
-    "Configure school-managed models, groups, tool access, account allowances, and data policy.",
-    "Evaluate the existing admin panel instead of building another administration stack.",
-    "Add a selected-context Canvas course/assignment/rubric picker with source cues.",
-    "Use a per-user Canvas connection and a server-enforced read-only tool allowlist.",
-    "Reuse the existing SharePoint / OneDrive file picker.",
-    "Add a few education helpers, help-style choices, visible teacher guidance, and simplified defaults.",
-    "Teacher helper sharing should use existing agents and resource ACLs."
+    "Use LibreChat's native chat, agents, tools, attachments, exports and institutional administration.",
+    "Study assignment help, reading/revision and bounded data/research activities with Webb students and faculty.",
+    "Complete the existing Canvas assignment/rubric experience with visible teacher assistance guidance and convenient hint, practice and critique choices.",
+    "Keep capable ordinary chat and evaluate a small institution-approved model choice with clear selection and budget explanations.",
+    "Make actual sources, incomplete retrieval, tool actions, calculations, outputs and cancellation easy to inspect.",
+    "Plan a short, editable AI-use disclosure for student work and faculty preparation, grounded in visible assistance rather than authorship claims.",
+    "Advance isolated Python execution through one academic task; validate hosting, file delivery and lifecycle boundaries before student use.",
+    "Evaluate against existing WebbGPT and participants' usual tools before adding selected OneDrive/SharePoint file access."
   ],
   "retained_boundaries": [
     "Open-source institutional distribution.",
@@ -28,11 +31,11 @@
     "School hosting is distinct from the approved model provider’s data handling."
   ],
   "deferred": [
-    "Shared task-folder provisioning and native folder permission management.",
-    "Parallel people/agents work board and isolated working-copy integration.",
-    "Custom artifact collaboration, merge handling, or real-time document editing.",
-    "GitHub, Slack, and Outlook integrations beyond the initial Canvas/Microsoft file-context pilot.",
-    "LTI launch, course roster sync, or per-course budget management until independently justified."
+    "Outlook/mailbox access and additional GitHub/Slack connectors.",
+    "Authenticated browser sessions, extensions, student-machine execution and general student terminal access.",
+    "Shared task-folder provisioning, native folder permission management and parallel-agent orchestration.",
+    "Custom artifact collaboration, working-copy integration, merging and real-time document editing.",
+    "LTI launch, course roster sync, per-course budgets and multi-school hosting until independently justified."
   ],
   "archive": {
     "path": "archive/2026-10-13-agent-workspace",
@@ -42,8 +45,8 @@
   },
   "reuse_plan": {
     "upstream": "Chat and AI runtime; school SSO; groups and permissions; approved model/tool configuration; account balances; shared agents; file uploads and Microsoft 365 file selection.",
-    "evaluate": "LibreChat Admin Panel preview; Canvas MCP read/authentication implementations; deployment precedents at Stanford and Brown.",
-    "custom": "School-friendly profile, Canvas context picker/citations, focused helper templates, clear help-style and teacher-guidance presentation.",
+    "evaluate": "Approved model quality/cost; deployment isolation and lifecycle behavior; the existing admin panel's deployment readiness. Earlier connector and institutional precedents remain dated research in references.json.",
+    "custom": "Existing Canvas/document integrations and school configuration; next, assistance-guidance presentation, activity-specific help choices, evidence/control usability and reviewed AI-use disclosure.",
     "avoid": "A new harness, LMS, shared filesystem, or editor. No current scope is selected merely because a plugin or upstream feature exists."
   },
   "prototype": {
@@ -62,12 +65,14 @@
       "Canvas / Microsoft account authorization or API calls.",
       "General-purpose source grounding, document parsing, live sharing, security enforcement, or retention services."
     ],
-    "storage": "New browser-local key fieldwork-librechat-pilot-v1. Earlier prototype state is kept separate."
+    "storage": "New browser-local key fieldwork-librechat-pilot-v1. Earlier prototype state is kept separate.",
+    "as_of": "2026-10-28",
+    "scope": "This section describes the historical HTML simulation only. Current application capabilities are recorded in ../docs/school.md."
   },
-  "privacy_and_authorization": "Do not promise that teachers cannot ever obtain student chats or that data never leaves the school. State voluntary sharing, published administrator access policy, and approved model-provider processing. Shared helpers must never confer the author’s source credentials.",
-  "prompt_guidance": "Help styles and teacher instructions steer model behavior; actual authorization comes from platform and connector controls, not prompts.",
+  "privacy_and_authorization": "Use explicit per-user connections, on-demand admitted sources, disclosed content access/retention and approved model-provider processing. Keep personal memory off by default in the intended study profile. Shared helpers never confer the author's credentials. Deployment controls and data handling must be verified before student use.",
+  "prompt_guidance": "Help styles and teacher instructions guide assistance; missing guidance remains unknown. Platform and connector controls enforce actual authorization. Help instructions cannot certify academic integrity or constrain other AI apps.",
   "source_record": "references.json",
-  "provenance": "All new HTML, CSS, JavaScript, branding, copy, and sample data are original for the brief. No upstream or fork source code has been copied. Source reviews identify reuse candidates, not tested production integrations.",
+  "provenance": "The October HTML/CSS/JavaScript, branding and sample data were original for the concept. Its historical validation below applies to that simulation. The live fork reuses LibreChat and separately recorded components; runtime status, attribution and verification are documented under ../docs/.",
   "validation": {
     "checks": [
       "Parsed both active JSON records and checked inline JavaScript syntax with node --check.",
@@ -80,12 +85,37 @@
       "No browser console warnings or errors were recorded during final QA.",
       "Checked local HTML links and preserved archive/example files."
     ],
-    "limit": "Local scripted simulation. Candidate integrations were researched, not deployed.",
+    "limit": "Historical HTML simulation checks only. Current runtime verification and deployment limits are recorded in ../docs/school.md and ../docs/browser-audit.md.",
     "previews": [
       "previews/pitch-librechat.jpg",
       "previews/mockup-librechat.jpg",
       "previews/admin-librechat.jpg",
       "previews/mockup-librechat-mobile.jpg"
-    ]
-  }
+    ],
+    "as_of": "2026-10-28"
+  },
+  "concept_date": "2026-10-28",
+  "priority_order": [
+    "Agree academic study activities and assistance guidance with faculty and students.",
+    "Complete one Canvas assignment help experience using existing source and chat paths.",
+    "Improve evidence inspection, control and reviewed AI-use disclosure.",
+    "Evaluate a small approved model choice on those activities.",
+    "Validate isolated Python for one data/research task.",
+    "Evaluate the full experience before expanding connectors or pursuing replacement."
+  ],
+  "excluded": [
+    "Microsoft sending or source writes.",
+    "Automated grading, academic misconduct detection or decisions, and student surveillance analytics.",
+    "Companion or therapy positioning."
+  ],
+  "scope_history": [
+    {
+      "date": "2026-10-28",
+      "decision": "Limit the product to a LibreChat fork; preserve the independent agent workspace in the archive."
+    },
+    {
+      "date": "2026-11-23",
+      "decision": "Use Webb context and freshman reflections to prioritize academic activities, assistance clarity, student control, evidence and a comparative study. Defer mailbox expansion."
+    }
+  ]
 }

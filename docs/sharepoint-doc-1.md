@@ -20,7 +20,7 @@ Canvas would continue to manage courses and assignments; SharePoint and OneDrive
 
 ## Where it is now
 
-There is a working local prototype with read-only Canvas access, document reading, web search, and limited public browser use. Code execution has a development demonstration; a version suitable for student use still needs work. Read-only Microsoft email and file connections are planned, subject to Webb review and permissions.
+There is a working local prototype with read-only Canvas access, document reading, web search, and limited public browser use. The next focus is trying a complete assignment, reading, or research activity with clear guidance about permitted help and visible sources and tool results. Code execution has a development demonstration; a version suitable for student use still needs work. Selected OneDrive/SharePoint files are a possible later connection when an activity needs them. Email access is deferred; Microsoft connections remain subject to Webb review and permissions.
 
 This is currently a development study. Hosting, privacy arrangements, and testing with educators all need further work before wider use.
 
@@ -29,5 +29,7 @@ This is currently a development study. Hosting, privacy arrangements, and testin
 If all goes well the intention is to make this a replacement of WebbGPT. If it goes even better this could be a generalisable platform for all schools. Then again this is only my proposal in the WebbGPT project/space.
 
 [Code and project notes on GitHub](https://github.com/PatrickJYKang/school-agent)
+
+[Current scope and development priorities](scope.md)
 
 *— Patrick K*

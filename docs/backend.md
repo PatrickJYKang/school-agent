@@ -2,11 +2,16 @@
 
 Design version 1, 2026-10-31. Implementation baseline: `10860fb`.
 
-This is the implementation guide for the limited LibreChat school pilot. It
-defines ownership, access and storage before adding Microsoft connections. Items
-marked **proposed** or **required** are not implemented controls. See
+This is the implementation guide for the limited LibreChat school study. It
+defines ownership, access and storage, including future Microsoft connections.
+Items marked **proposed** or **required** are not implemented controls. See
 [`school.md`](school.md) for working features and [`microsoft.md`](microsoft.md)
 for the agreed read-only scope and IT discussion.
+
+The November 23 [scope and priorities](scope.md) govern the order of work: complete
+the Canvas academic activity and evidence/control experience, then evaluate it
+with students and faculty. Microsoft integration is no longer the next milestone;
+selected files are conditional on activity needs and mailbox access is deferred.
 
 ## Decisions and boundaries
 
@@ -210,18 +215,18 @@ the institution's retention policy and end-to-end deletion verification are pend
 
 ## Implementation sequence and completion evidence
 
-| Stage                          | State and next work                                                                                                                                                                                                                                                                     |
-| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Current pilot                  | Native helpers, Canvas connection/tools, uploaded-document reading, public fetch/search, school policy controls and existing admin infrastructure are implemented. Brave live search awaits a local key. Microsoft is not connected.                                                    |
-| Backend foundations            | Implement/test the connection adapter and metadata migration, sensitive conversation profile and server-side provider/tool restrictions; extend existing audit actions. Keep new configuration in the shared config schema and database contracts in data-schemas.                      |
-| Developer-only Microsoft pilot | Agree hosting, identity, admitted account, permitted sources/model, retention and operator access with IT. Configure delegated read-only access; implement bounded mail/file tools and native connect/disconnect/reconnect entry points. No bulk indexing.                              |
-| Broader school pilot           | Validate admission/role policies, permission changes, deletion and operational access with representative accounts before adding students.                                                                                                                                              |
-| Execution design               | The [server execution plan](execution.md) targets Python in disposable guests on dedicated school infrastructure. The [local terminal](terminal.md) remains a developer demonstration. Keep execution excluded from sensitive Microsoft profiles until restrictions are enforced.       |
-| School browser                 | The local [public browser](browser-audit.md) now supports rendered reads, link navigation, screenshots and user Stop/restart through native LibreChat. A dedicated deployment and stronger workload separation remain required for school rollout; selected local tabs remain deferred. |
-| Deferred                       | Local student machine agents, whole-desktop control, multi-school hosting, folder orchestration, merging and collaborative editing remain outside this study. Microsoft sending/writing is excluded, not a promised later feature.                                                      |
+| Stage | State and next work |
+| --- | --- |
+| Current local study | Native helpers, Canvas tools/picker, document reading, public fetch/search, local rendered browsing, school policy controls and admin infrastructure are implemented. Live Brave search requires a configured key. Microsoft is not connected. |
+| Next academic experience | Reuse the existing source and chat paths for assignment/rubric context, visible teacher assistance guidance, help choices, source/limit inspection, tool control and reviewed AI-use disclosure. Treat guidance as content, not authorization. Evaluate a small approved model choice. |
+| Student study readiness | Agree activities, permitted materials and participation with faculty/students. Validate admission, source isolation, policy changes, provider destinations, retention/deletion and operator access with representative accounts before student use. Follow the comparison and outcome plan in [scope.md](scope.md). |
+| Bounded execution activity | Advance one academic Python task under the [server execution plan](execution.md), including isolated guests, owned input/output transfer, cancellation and deployment checks. The [local terminal](terminal.md) is a developer demonstration. Sensitive Microsoft profiles continue to exclude execution until restrictions are enforced. |
+| Public browser in study tasks | Reuse the [existing local browser](browser-audit.md) and inspect actual source, screenshot, failure and Stop/restart behavior. Dedicated deployment and stronger workload separation are required before students use it. |
+| Conditional Microsoft files | After activity evaluation, consider selected OneDrive/SharePoint files if needed. Agree hosting, identity, permitted content/model, retention and operator access. Implement/test the connection adapter, sensitive profile, server-side disclosure restrictions and relevant audit events before real data. No bulk indexing. |
+| Deferred | Mailbox integration, local student-machine agents, authenticated browser/desktop control, multi-school hosting, additional connectors, folder orchestration, merging and custom collaborative editing. Automated grading, AI detection and surveillance analytics are excluded from the initial scope. Microsoft sending/writing remains excluded. |
 
-Evidence required for the sensitive pilot: a second user cannot use the developer's
-connection or files; model-supplied IDs cannot change ownership; revocation/policy
+Evidence required before any future sensitive Microsoft study: a second user
+cannot use the developer's connection or files; model-supplied IDs cannot change ownership; revocation/policy
 changes block new disclosure in existing runs; restored/branched chats retain their
 restrictions; alternate agents/endpoints cannot export private history; malicious
 source instructions cannot invoke an outward tool; no send/write request is

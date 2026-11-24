@@ -8,7 +8,15 @@ Outlook agent tool has been implemented.
 The implementation design, including connection ownership, restricted execution
 and content lifecycle, is in [`backend.md`](backend.md).
 
-## What the user should be able to do
+## Priority after the academic activity study
+
+The November 23 [scope update](scope.md) puts the existing Canvas, document and
+research experience first. Selected OneDrive/SharePoint files are a possible next
+connection if a study activity requires them. Mailbox access is deferred. The
+earlier mail/file proposal below remains a technical reference; it is not the
+next development milestone or a request to enable all listed permissions.
+
+## Possible future user capabilities
 
 - Connect their own school account, initially with only the developer admitted
   to the pilot.
@@ -25,9 +33,10 @@ There is no planned later stage enabling email sending or Microsoft writes.
 
 ## What school IT would enable
 
-The first request is help establishing a school-controlled development
-connection to the developer's account. The school chooses the approved hosting
-and sign-in arrangement and retains the ability to restrict or revoke access.
+If selected files are justified by the activity study, ask for help establishing
+a school-controlled development connection limited to that purpose. Mailbox
+access needs a separate demonstrated use and review. The school chooses the
+approved hosting and sign-in arrangement and retains the ability to restrict or revoke access.
 The meeting should establish who can maintain ordinary development configuration
 and who handles institutional approvals.
 
@@ -109,6 +118,7 @@ that all stored conversation data is encrypted at rest or ephemeral. No such
 guarantee should be made to IT without deployment-specific verification. Existing
 content-filter hooks are not a guarantee of automatic sensitive-data removal.
 
-For the meeting, explain the read-only/account boundary and the proposed data
-flow, then ask IT to help establish an acceptable development setup. A broader
-student rollout is a separate decision.
+In a future Microsoft access review, explain the selected purpose, read-only
+account boundary and proposed data flow, then agree an acceptable development
+setup with Mr. Guyer and the supporting faculty. Broader student use is a separate
+decision.
