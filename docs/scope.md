@@ -1,6 +1,6 @@
 # Webb school AI scope and priorities
 
-Updated November 23, 2026. This LibreChat fork is a candidate for WebbGPT's next
+Updated November 24, 2026. This LibreChat fork is a candidate for WebbGPT's next
 version within the AI Project@Webb. The first study focuses on useful academic
 work, clear guidance about permitted assistance, student control and inspectable
 sources and tool results. A decision to replace WebbGPT follows evaluation with
@@ -10,6 +10,12 @@ This is the current planning reference. The
 [Webb research note](devdocs/2026-11-23-webb.md) records the reasoning and sources;
 [school.md](school.md) describes the implemented prototype. This order of work
 supersedes the earlier sequence that put Microsoft account integration next.
+
+The agreed [dashboard and organization flow](dashboard.md) adds an assignment-led
+home page, automatic personal course folders after a remembered user choice, a
+New chat destination picker and common Canvas assignment context across project
+chats. Collaboration starts with named viewers who automatically see the latest
+chat; live multi-author conversation remains deferred.
 
 ## Academic activities
 
@@ -35,8 +41,14 @@ restriction on every student conversation.
    assignments, identify the learning objective and record the teacher's written
    assistance guidance. Include students who are skeptical or prefer other
    tools. Use synthetic or explicitly admitted materials during development.
-2. **Complete one assignment help experience.** Reuse the existing Canvas tools
-   and picker. Keep the assignment, rubric, source links and teacher guidance
+2. **Build the dashboard and complete the assignment help experience.** Reuse the
+   existing Canvas tools and native personal projects. Show upcoming assignments
+   with separate Open in Canvas, Start chat and Add to project actions. Keep a
+   course-folder permission prompt visible until Allow/Don't allow is chosen and
+   remember the decision. The generic New chat action opens the destination
+   picker. All assignments added to a project supply common context across its
+   chats. Follow [dashboard.md](dashboard.md) for the exact flow. Keep the
+   assignment, rubric, source links and teacher guidance
    accessible beside the conversation. Offer convenient hint, practice and
    critique choices. If assistance guidance is absent, show that its status is
    unknown and direct the student to their teacher. Done means a student can
@@ -50,6 +62,10 @@ restriction on every student conversation.
    let the person review it before copying or exporting it. It must not invent
    authorship, certify honesty or expose hidden model reasoning. Apply the same
    disclosure option to faculty preparation.
+   Add explicitly granted view-only collaborators who see current chat updates
+   automatically. Reuse native access-control patterns while keeping message,
+   context and assistant actions with the owner; snapshots alone do not satisfy
+   this live-view requirement.
 4. **Evaluate a small approved model choice.** Compare a few capable models on
    the selected activities, including answer quality, tool reliability and cost.
    Explain which are offered and why, and show usable allowance information.
@@ -70,19 +86,26 @@ restriction on every student conversation.
 
 ## Current implementation and remaining work
 
-| Area              | Existing baseline                                                                                      | Next work                                                                                                                                                                         |
-| ----------------- | ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Academic context  | Read-only per-user Canvas tools and picker; uploaded-document reading; source links and bounded reads. | Present assignment guidance, assistance choices and retrieval limits consistently in the complete activity.                                                                       |
-| Chat and evidence | Native LibreChat helpers, activity, attachments, exports and school configuration.                     | Evaluate model choice and a reviewed AI-use summary. Neither is a completed new feature.                                                                                          |
-| Public research   | Public URL reading, Brave search integration and a local rendered-page browser with Stop/restart.      | Validate source inspection and failure/cancellation behavior in study tasks. Live search requires the institution's configured key. Browser deployment isolation remains pending. |
-| Python            | Developer terminal demonstration and documented server architecture.                                   | Implement and verify the isolated academic execution path and output-file delivery before student use.                                                                            |
-| Microsoft         | Existing upstream file picker; read-only integration design. No configured school connection.          | Consider selected files after the initial activity study. Revisit mail only for a demonstrated need and a separate access review.                                                 |
-| Operations        | Local prototype, policy controls and upstream management infrastructure.                               | Agree hosting, account admission, approved providers, budgets, content access, retention and maintenance responsibility.                                                          |
+| Area                       | Existing baseline                                                                                      | Next work                                                                                                                                                                                         |
+| -------------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Academic context           | Read-only per-user Canvas tools and picker; uploaded-document reading; source links and bounded reads. | Present assignment guidance, assistance choices and retrieval limits consistently in the complete activity.                                                                                       |
+| Dashboard and organization | Native personal projects with common instructions and reference files; Canvas course/assignment reads. | Add the upcoming-assignment dashboard, persistent course-folder choice, course destinations, project assignment context and the New chat picker. These school-specific flows are not implemented. |
+| Chat and evidence          | Native LibreChat helpers, activity, attachments, exports and school configuration.                     | Evaluate model choice and a reviewed AI-use summary. Neither is a completed new feature.                                                                                                          |
+| View-only collaborators    | Upstream access-controlled snapshots; conversations still have a single owner.                         | Add named live viewers, automatic current-chat updates and revocable read-only access to the selected chat and included files. Live viewers are not implemented.                                  |
+| Public research            | Public URL reading, Brave search integration and a local rendered-page browser with Stop/restart.      | Validate source inspection and failure/cancellation behavior in study tasks. Live search requires the institution's configured key. Browser deployment isolation remains pending.                 |
+| Python                     | Developer terminal demonstration and documented server architecture.                                   | Implement and verify the isolated academic execution path and output-file delivery before student use.                                                                                            |
+| Microsoft                  | Existing upstream file picker; read-only integration design. No configured school connection.          | Consider selected files after the initial activity study. Revisit mail only for a demonstrated need and a separate access review.                                                                 |
+| Operations                 | Local prototype, policy controls and upstream management infrastructure.                               | Agree hosting, account admission, approved providers, budgets, content access, retention and maintenance responsibility.                                                                          |
 
 ## Product and access boundaries
 
 - Keep LibreChat's default visual language, chat and administration. Reuse its
   roles, profiles and sharing instead of adding a competing management system.
+- Course folders are personal app organization, generated only after the user's
+  persisted choice. They do not create cloud folders or grant teacher/classmate
+  access. Projects can have a course home and multiple assignment sources;
+  all project chats share admitted assignment context. View grants are explicit
+  per conversation, include ongoing updates and allow no actions in that chat.
 - Teacher assistance guidance is source material presented to the learner and
   model. It does not grant connector access or override institution policy.
   Enforce tool and source permissions on the server. The interface cannot
@@ -116,6 +139,10 @@ ready, a data/research task. Compare equivalent tasks under the same assistance
 boundaries. Record observations with participant knowledge and retain only the
 study information the school has agreed to collect.
 
+Include a brief worksheet chat, sustained multi-assignment project and view-only
+teacher/peer review in the study. Check dashboard discovery, destination choices,
+remembered folder permission and whether project context is available across chats.
+
 Evaluate understanding through an explanation or follow-up attempt without the
 assistant; inspect sources and calculations; ask whether assistance boundaries
 and delegated work were clear. Also evaluate usefulness, task time, repeat-use
@@ -134,9 +161,10 @@ other schools follows evidence from Webb rather than expanding the first study.
 
 ## Deferred work
 
+Live multi-author chats, in-chat comments and shared agent execution;
 Outlook/mailbox integration; additional GitHub/Slack connectors; authenticated
 browser sessions and extensions; student-machine execution; general terminal
-access for students; parallel-agent orchestration; shared-folder provisioning
+access for students; parallel-agent orchestration; external shared-folder provisioning
 and merging; a custom collaborative editor; and multi-school hosting remain
 deferred. Microsoft sending and source writes remain excluded. Their earlier
 designs stay available for reference, without becoming the next implementation

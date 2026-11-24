@@ -20,7 +20,7 @@ Canvas would continue to manage courses and assignments; SharePoint and OneDrive
 
 ## Where it is now
 
-There is a working local prototype with read-only Canvas access, document reading, web search, and limited public browser use. The next focus is trying a complete assignment, reading, or research activity with clear guidance about permitted help and visible sources and tool results. Code execution has a development demonstration; a version suitable for student use still needs work. Selected OneDrive/SharePoint files are a possible later connection when an activity needs them. Email access is deferred; Microsoft connections remain subject to Webb review and permissions.
+There is a working local prototype with read-only Canvas access, document reading, web search, and limited public browser use. Next is a dashboard of upcoming assignments, with routes into course chats and projects that share assignment context across their conversations. Course folders would be generated after the user's permission, and invited collaborators could view a chat as it updates. This will support trying complete academic activities with clear guidance about permitted help and visible sources and tool results. Code execution has a development demonstration; a version suitable for student use still needs work. Selected OneDrive/SharePoint files are a possible later connection when an activity needs them. Email access is deferred; Microsoft connections remain subject to Webb review and permissions.
 
 This is currently a development study. Hosting, privacy arrangements, and testing with educators all need further work before wider use.
 

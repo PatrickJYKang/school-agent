@@ -1,11 +1,15 @@
 # School study implementation
 
-The [current scope and priorities](scope.md), updated November 23, 2026, focus
+The [current scope and priorities](scope.md), updated November 24, 2026, focus
 this WebbGPT replacement candidate on assignment/study help, reading/revision
 and bounded data/research work. The next development work is a complete Canvas
 assignment experience, visible assistance guidance, inspectable evidence and
-student control. Proposed study features and model choice are listed separately
-from the working capabilities below.
+student control. The [dashboard specification](dashboard.md) now calls for
+upcoming assignments, remembered course-folder permission, a New chat destination
+picker, common assignment context across project chats and named live viewers.
+Those school-specific flows and model choice are planned work, separate from the
+working capabilities below. Native personal projects already supply chat grouping,
+instructions and reference files.
 
 The application keeps LibreChat's standard layout, logo, theme, model menu, dialogs,
 file attachments, exports, agents, and permissions. The HTML concept is a reference;

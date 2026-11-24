@@ -56,6 +56,9 @@
 This fork is a candidate for WebbGPT's next version. The current study focuses on
 assignment help, reading/revision and bounded data/research work, with visible
 assistance guidance, student control and inspectable sources and tool results.
+The next [dashboard and organization work](docs/dashboard.md) adds upcoming
+assignments, personal course folders, common project context and live read-only
+chat viewers.
 
 Start with the [scope and priorities](docs/scope.md), the
 [Webb context and student reflections](docs/devdocs/2026-11-23-webb.md), and the

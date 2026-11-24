@@ -8,8 +8,9 @@ Items marked **proposed** or **required** are not implemented controls. See
 [`school.md`](school.md) for working features and [`microsoft.md`](microsoft.md)
 for the agreed read-only scope and IT discussion.
 
-The November 23 [scope and priorities](scope.md) govern the order of work: complete
-the Canvas academic activity and evidence/control experience, then evaluate it
+The November 24 [scope and priorities](scope.md) govern the order of work: build
+the [assignment dashboard, course/project organization and live viewer flow](dashboard.md),
+complete the academic activity and evidence/control experience, then evaluate it
 with students and faculty. Microsoft integration is no longer the next milestone;
 selected files are conditional on activity needs and mailbox access is deferred.
 
@@ -22,12 +23,17 @@ selected files are conditional on activity needs and mailbox access is deferred.
   helpers are configured model specs; they are not new agent identities or users.
 - Each person connects their own source accounts. Sharing a helper never lends
   its creator's connection to another person. Being an educator does not grant
-  access to students' conversations or connected accounts.
+  access to students' conversations or connected accounts. Explicitly invited
+  chat viewers can read current messages and ongoing updates, with no rights to
+  mutate the chat, execute tools or use the owner's connection.
 - Microsoft access is **read-only**, including attachments. No sending, Outlook
   drafts, mailbox-state changes, file edits, folder creation or sharing changes.
   There is no planned send/write phase. Canvas remains read-only too.
-- Retrieve relevant sources on demand. Do not mirror mailboxes, drives, courses
-  or rosters. The institution decides permitted providers and data handling.
+- Retrieve relevant sources on demand. With the user's persisted choice, retain
+  bounded course metadata for personal app folders and upcoming assignments.
+  Explicitly added project assignments contribute admitted common context to
+  every project chat. Do not mirror whole course corpora, mailboxes, drives or
+  rosters. The institution decides permitted providers and data handling.
 - Markdown is the intended working-document format; PDF and Word remain sources.
   No mandatory relationship between a working document and an original, no Word
   editor and no new collaborative-document subsystem.
@@ -51,6 +57,9 @@ context. Source-account directory IDs must not be substituted for app tenant IDs
 | Config                             | Principal type/ID, `priority`, `overrides`, `isActive`, `configVersion`, tenant scope | Existing YAML plus administrator-managed overrides. School settings live at `interface.school`; provider and retention settings retain their existing locations.                   |
 | Model spec / Agent / ACL           | Configured helper specs; saved agent resources and resource grants                    | Reuse helper definitions and native sharing. An agent's instructions do not authorize a tool or grant access to a source.                                                          |
 | Conversation / Message             | `conversationId`, `messageId`, owner `user`, tenant scope, retention fields           | Existing chat history, including answers and tool content. Connections are resolved for the executing user.                                                                        |
+| Personal Chat Project | Existing owner, instructions, reference files and context revision. | Reuse the native project. Proposed additions are an optional course-folder home and admitted Canvas assignment references/materials. All project chats receive that common source context on later turns. |
+| Course folders and sync choice | Proposed owner-scoped course metadata and an undecided/allowed/denied preference, using existing preference mechanisms where suitable. | Persist by user and Canvas account/site. Direct course chats reference the course folder; project chats derive the course home from their project. Stable Canvas IDs prevent duplicate folders. No source-system folders or roster grants. |
+| Conversation viewers | Reuse resource permission mechanisms; proposed explicit live-read grant for a conversation. | Authorize latest-message, included-file and update reads for named viewers. Preserve the single owner for mutations and assistant execution. This is not a native ShareLink snapshot or a project-wide membership grant. |
 | File                               | `file_id`, owner, storage reference, delivery state, conversation context, expiry     | Existing upload/storage pipeline. The document reader admits current-context files and rechecks owner, tenant and file state.                                                      |
 | PluginAuth / existing token stores | User, connector key, encrypted credential value; tenant context                       | Canvas currently uses PluginAuth. Reuse suitable upstream OAuth storage for Microsoft after reviewing refresh, revocation and token exposure.                                      |
 | ToolCall / message tool content    | Conversation/message IDs, owner, results and attachments                              | Native activity display and replay. Results can contain private source text; these are content records, not a minimal audit log.                                                   |
@@ -215,15 +224,23 @@ the institution's retention policy and end-to-end deletion verification are pend
 
 ## Implementation sequence and completion evidence
 
+The organization, common-context and viewer acceptance contract is in
+[dashboard.md](dashboard.md). These are bounded extensions to native projects and
+source handling. Current project file admission accepts owned, available
+reference files; Canvas project imports and viewer reads need explicit admission
+paths, rather than removing the existing ownership checks. Recheck live-view
+grants on updates and included-file reads and stop them after revocation.
+
 | Stage | State and next work |
 | --- | --- |
 | Current local study | Native helpers, Canvas tools/picker, document reading, public fetch/search, local rendered browsing, school policy controls and admin infrastructure are implemented. Live Brave search requires a configured key. Microsoft is not connected. |
-| Next academic experience | Reuse the existing source and chat paths for assignment/rubric context, visible teacher assistance guidance, help choices, source/limit inspection, tool control and reviewed AI-use disclosure. Treat guidance as content, not authorization. Evaluate a small approved model choice. |
+| Next academic experience | Build the upcoming-assignment dashboard, persistent course-folder choice and New chat destination picker. Add Canvas assignment material as common context across all project chats. Reuse source/chat paths for teacher guidance, help choices, evidence/control and reviewed AI-use disclosure. Treat guidance as content, not authorization. |
+| View-only collaborators | Add named viewers of the latest saved conversation with automatic updates and explicitly included files. Keep chat/context changes and agent runs owner-only. Existing snapshots remain separate; live multi-author chat is deferred. |
 | Student study readiness | Agree activities, permitted materials and participation with faculty/students. Validate admission, source isolation, policy changes, provider destinations, retention/deletion and operator access with representative accounts before student use. Follow the comparison and outcome plan in [scope.md](scope.md). |
 | Bounded execution activity | Advance one academic Python task under the [server execution plan](execution.md), including isolated guests, owned input/output transfer, cancellation and deployment checks. The [local terminal](terminal.md) is a developer demonstration. Sensitive Microsoft profiles continue to exclude execution until restrictions are enforced. |
 | Public browser in study tasks | Reuse the [existing local browser](browser-audit.md) and inspect actual source, screenshot, failure and Stop/restart behavior. Dedicated deployment and stronger workload separation are required before students use it. |
 | Conditional Microsoft files | After activity evaluation, consider selected OneDrive/SharePoint files if needed. Agree hosting, identity, permitted content/model, retention and operator access. Implement/test the connection adapter, sensitive profile, server-side disclosure restrictions and relevant audit events before real data. No bulk indexing. |
-| Deferred | Mailbox integration, local student-machine agents, authenticated browser/desktop control, multi-school hosting, additional connectors, folder orchestration, merging and custom collaborative editing. Automated grading, AI detection and surveillance analytics are excluded from the initial scope. Microsoft sending/writing remains excluded. |
+| Deferred | Live multi-author chat, comments, shared agent execution, mailbox integration, local student-machine agents, authenticated browser/desktop control, multi-school hosting, additional connectors, external folder orchestration, merging and custom collaborative editing. Automated grading, AI detection and surveillance analytics are excluded from the initial scope. Microsoft sending/writing remains excluded. |
 
 Evidence required before any future sensitive Microsoft study: a second user
 cannot use the developer's connection or files; model-supplied IDs cannot change ownership; revocation/policy
