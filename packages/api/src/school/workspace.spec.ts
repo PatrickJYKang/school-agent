@@ -316,6 +316,35 @@ it('rejects protected assignment text before copying it into history or project 
   expect((await methods.getSchoolProject(owner, project._id))?.school?.sources).toHaveLength(0);
 });
 
+it('keeps server-private helper instructions out of newly created chat records', async () => {
+  const { app, config } = fixture();
+  config.modelSpecs = {
+    list: [
+      {
+        name: 'guarded-helper',
+        label: 'Study',
+        default: true,
+        preset: {
+          endpoint: 'openAI',
+          model: 'gpt-6-luna',
+          promptPrefix: 'PRIVATE_HELPER_PROMPT',
+          instructions: 'PRIVATE_HELPER_INSTRUCTIONS',
+        },
+      },
+    ],
+  };
+  const result = await supertest(app)
+    .post('/school/workspace/chats')
+    .set('x-user', owner.user)
+    .send({ assignment: { courseId: '1', id: '2' } })
+    .expect(201);
+  const saved = await mongoose.models.Conversation.findOne({
+    conversationId: result.body.conversationId,
+  }).lean();
+  expect(saved).toMatchObject({ spec: 'guarded-helper', endpoint: 'openAI', model: 'gpt-6-luna' });
+  expect(JSON.stringify(saved)).not.toContain('PRIVATE_HELPER');
+});
+
 it('serves latest text only to named viewers, follows the latest branch, and stops after revocation', async () => {
   const { app } = fixture();
   const viewer = await mongoose.models.User.create({

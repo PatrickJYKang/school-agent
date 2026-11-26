@@ -18,6 +18,7 @@ import { canvasOrigin, CanvasError, createCanvasClient } from './canvas';
 import { createShareContentPreflight } from '../shared-links/protection';
 import { assertConversationImportContentAllowed } from '../imports';
 import { isContentFilterError } from '../middleware/contentFilter';
+import { PRIVATE_MODEL_SPEC_PRESET_FIELDS } from '../modelSpecs';
 import { getAppConfigOptionsFromUser } from '~/app/service';
 import { inspectSchoolDocument } from './documents/policy';
 import { DocumentReadError } from './documents/types';
@@ -351,6 +352,11 @@ export function createSchoolWorkspaceRouter(
         context.config.modelSpecs?.list?.find((item) => item.default) ??
         context.config.modelSpecs?.list?.[0];
       const configured = spec?.preset ? tModelSpecPresetSchema.parse(spec.preset) : undefined;
+      // These fields are applied by the model-spec boundary on each turn and
+      // must not become user-visible conversation preferences.
+      if (configured) {
+        for (const field of PRIVATE_MODEL_SPEC_PRESET_FIELDS) delete configured[field];
+      }
       const preset = {
         ...configured,
         endpoint: configured?.endpoint ?? (configured?.agent_id ? 'agents' : 'openAI'),
