@@ -23,6 +23,7 @@ import ConversationStarters from './Input/ConversationStarters';
 import ProjectBadge from '~/components/Projects/ProjectBadge';
 import { OwnerTextProvider } from './Messages/PrivateText';
 import { useAddedResponse, useLocalize } from '~/hooks';
+import CourseBadge from '~/components/School/Badge';
 import MessagesView from './Messages/MessagesView';
 import Presentation from './Presentation';
 import ChatForm from './Input/ChatForm';
@@ -90,6 +91,9 @@ function ChatViewPane({
     chat.conversation?.conversationId === conversationId ? chat.conversation : undefined;
   const activeSubagentThread = activeConversation?.subagentThread;
   const chatProjectId = activeConversation?.chatProjectId || undefined;
+  const courseBadge = activeConversation?.schoolCourseId ? (
+    <CourseBadge id={activeConversation.schoolCourseId} />
+  ) : null;
 
   const view = getChatPaneView({
     conversationId,
@@ -139,9 +143,18 @@ function ChatViewPane({
                           readOnly={isSubagentThreadReadOnly}
                         />
                       }
-                      badge={chatProjectId ? <ProjectBadge projectId={chatProjectId} /> : null}
+                      badge={
+                        chatProjectId ? <ProjectBadge projectId={chatProjectId} /> : courseBadge
+                      }
                       messages={<MessagesView messagesTree={messagesTree} messages={messages} />}
-                      landing={<Landing centerFormOnLanding={centerFormOnLanding} />}
+                      landing={
+                        <>
+                          {courseBadge && (
+                            <div className="mb-3 flex justify-center">{courseBadge}</div>
+                          )}
+                          <Landing centerFormOnLanding={centerFormOnLanding} />
+                        </>
+                      }
                       renderColumn={(column) => (
                         <OwnerTextProvider
                           messages={messages}

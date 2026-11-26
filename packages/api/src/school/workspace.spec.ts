@@ -19,7 +19,7 @@ beforeAll(async () => {
 });
 afterEach(async () => {
   await Promise.all(
-    ['ChatProject', 'Conversation', 'Message', 'SchoolState', 'User'].map((name) =>
+    ['ChatProject', 'Conversation', 'Message', 'SchoolState', 'SchoolCourse', 'User'].map((name) =>
       mongoose.models[name].deleteMany({}),
     ),
   );
@@ -108,8 +108,9 @@ it('keeps the consent prompt undecided until an explicit choice; only Allow crea
     .get('/school/workspace')
     .set('x-user', owner.user)
     .expect(200);
-  expect(allowed.body.projects).toHaveLength(1);
-  expect(allowed.body.projects[0].school).toMatchObject({ kind: 'course', courseId: '1' });
+  expect(allowed.body.projects).toEqual([]);
+  expect(allowed.body.courses).toHaveLength(1);
+  expect(allowed.body.courses[0]).toMatchObject({ name: 'History', canvasCourseId: '1' });
   expect(await mongoose.models.Conversation.countDocuments()).toBe(0);
 });
 
@@ -425,4 +426,51 @@ it('serves latest text only to named viewers, follows the latest branch, and sto
     .get(`/school/workspace/view/${id}`)
     .set('x-user', String(viewer._id))
     .expect(404);
+});
+
+it('keeps direct course chats separate from native projects and checks course access before Canvas fetches', async () => {
+  const { app, fetchFn } = fixture();
+  await methods.syncSchoolCourses(owner, `${origin}/42`, [{ id: '1', name: 'History' }]);
+  const course = (await methods.listSchoolCourses(owner, 10)).courses[0];
+  await supertest(app)
+    .get(`/school/workspace/courses/${course.id}`)
+    .set('x-user', 'other')
+    .expect(404);
+  await supertest(app)
+    .get(`/school/workspace/courses/${course.id}`)
+    .set('x-user', owner.user)
+    .expect(200);
+  await supertest(app)
+    .post('/school/workspace/chats')
+    .set('x-user', 'other')
+    .send({ schoolCourseId: course.id, assignment: { courseId: '1', id: '2' } })
+    .expect(404);
+  expect(fetchFn).not.toHaveBeenCalled();
+  const result = await supertest(app)
+    .post('/school/workspace/chats')
+    .set('x-user', owner.user)
+    .send({ schoolCourseId: course.id, assignment: { courseId: '1', id: '2' } })
+    .expect(201);
+  const saved = await mongoose.models.Conversation.findOne({
+    conversationId: result.body.conversationId,
+  });
+  expect(saved.schoolCourseId).toBe(course.id);
+  expect(saved.chatProjectId).toBeNull();
+  expect(await mongoose.models.ChatProject.countDocuments()).toBe(0);
+  const page = await supertest(app)
+    .get(`/school/workspace/courses/${course.id}/chats`)
+    .set('x-user', owner.user)
+    .expect(200);
+  expect(page.body.chats).toEqual([
+    expect.objectContaining({ title: 'Essay', conversationId: result.body.conversationId }),
+  ]);
+  await supertest(app)
+    .get(`/school/workspace/courses/${course.id}/chats`)
+    .set('x-user', owner.user)
+    .set('x-tenant', 'other-school')
+    .expect(404);
+  await supertest(app)
+    .get(`/school/workspace/courses/${course.id}/chats?cursor=bad`)
+    .set('x-user', owner.user)
+    .expect(400);
 });

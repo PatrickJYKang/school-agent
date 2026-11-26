@@ -1260,6 +1260,7 @@ export const tConversationSchema = z.object({
   /* DB */
   tags: z.array(z.string()).optional(),
   chatProjectId: z.string().nullable().optional(),
+  schoolCourseId: z.string().nullable().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
   /** Set only when an assistant message is persisted; drives the unseen-reply indicator. */
@@ -1333,6 +1334,7 @@ export const tPresetSchema = tConversationSchema
   .omit({
     conversationId: true,
     chatProjectId: true,
+    schoolCourseId: true,
     createdAt: true,
     updatedAt: true,
     title: true,

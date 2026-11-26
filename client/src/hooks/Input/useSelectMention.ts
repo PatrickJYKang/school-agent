@@ -121,6 +121,7 @@ export default function useSelectMention({
         template: {
           ...(template as Partial<TConversation>),
           chatProjectId: routeChatProjectId ?? conversation?.chatProjectId ?? null,
+          schoolCourseId: routeChatProjectId ? null : (conversation?.schoolCourseId ?? null),
         },
         preset,
         keepAddedConvos: isModular,
@@ -219,6 +220,7 @@ export default function useSelectMention({
         template: {
           ...(template as Partial<TConversation>),
           chatProjectId: routeChatProjectId ?? conversation?.chatProjectId ?? null,
+          schoolCourseId: routeChatProjectId ? null : (conversation?.schoolCourseId ?? null),
         },
         preset: { ...kwargs, spec: null, iconURL: null, modelLabel: null, endpoint: newEndpoint },
         keepAddedConvos: isNewModular,
@@ -289,7 +291,10 @@ export default function useSelectMention({
 
       logger.info('conversation', 'Switching conversation to new preset', template);
       newConversation({
-        template: { chatProjectId: routeChatProjectId ?? conversation?.chatProjectId ?? null },
+        template: {
+          chatProjectId: routeChatProjectId ?? conversation?.chatProjectId ?? null,
+          schoolCourseId: routeChatProjectId ? null : (conversation?.schoolCourseId ?? null),
+        },
         preset: newPreset,
         keepAddedConvos: isModular,
         disableParams,

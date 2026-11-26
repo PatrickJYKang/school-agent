@@ -15,8 +15,8 @@ export type ConversationWriteContext = Parameters<SaveConvo>[0];
 
 /** The request state a turn's conversation writes read and update. */
 export interface TurnConversationRequest {
-  user?: { id?: string };
-  body?: { isTemporary?: boolean };
+  user?: { id?: string; tenantId?: string };
+  body?: { isTemporary?: boolean; schoolCourseId?: string | null };
   config?: { interfaceConfig?: AppConfig['interfaceConfig'] };
   /** Server-captured creation time, stamped only when a write inserts the row. */
   conversationCreatedAt?: string;
@@ -175,7 +175,8 @@ async function writeConversation(
   const { req, ctx, conversationId, endpoint, endpointType, endpointOptions = {} } = write;
   const agentOwned = isAgentOwned(write);
   const inserting = write.initialized !== true && existing == null;
-  const { chatProjectId, ...storedOptions } = endpointOptions;
+  const { chatProjectId, schoolCourseId, ...storedOptions } = endpointOptions;
+  const requestedCourseId = schoolCourseId ?? req?.body?.schoolCourseId;
   const conversation = await deps.saveConvo(
     ctx,
     {
@@ -183,6 +184,9 @@ async function writeConversation(
       endpointType,
       ...storedOptions,
       ...(inserting && chatProjectId !== undefined ? { chatProjectId } : {}),
+      ...(inserting && requestedCourseId
+        ? { schoolCourseId: requestedCourseId, tenantId: req?.user?.tenantId }
+        : {}),
       conversationId: endpointOptions.conversationId ?? conversationId,
     },
     {

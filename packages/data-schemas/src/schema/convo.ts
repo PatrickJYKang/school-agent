@@ -390,6 +390,7 @@ const convoSchema: Schema<IConversation> = new Schema(
       default: [],
       meiliIndex: true,
     },
+    schoolCourseId: { type: String, default: null },
     chatProjectId: {
       type: String,
       default: null,
@@ -445,6 +446,7 @@ convoSchema.index({ tenantId: 1, isTemporary: 1, createdAt: -1, _id: -1 });
 convoSchema.index({ tenantId: 1, isTemporary: 1, initial_agent_id: 1, createdAt: -1, _id: -1 });
 convoSchema.index({ tenantId: 1, isTemporary: 1, agent_id: 1, createdAt: -1, _id: -1 });
 convoSchema.index({ user: 1, _id: 1 });
+convoSchema.index({ user: 1, schoolCourseId: 1, updatedAt: -1, _id: -1 });
 convoSchema.index({ user: 1, chatProjectId: 1, updatedAt: -1, _id: -1 });
 convoSchema.index({ user: 1, chatProjectId: 1, createdAt: -1, _id: -1 });
 /** The archive view pages by `archivedAt`, then `createdAt`, then `_id`; the middle key

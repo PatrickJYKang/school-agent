@@ -251,6 +251,7 @@ export const excludedKeys = new Set([
   'spec',
   'disableParams',
   'chatProjectId',
+  'schoolCourseId',
   'lastResponseAt',
   'lastResponseMessageId',
   'lastResponseIsManual',

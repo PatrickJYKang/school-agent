@@ -3,7 +3,6 @@ import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { dataService, MutationKeys } from 'librechat-data-provider';
 import {
   Button,
-  Input,
   OGDialog,
   OGDialogContent,
   OGDialogTitle,
@@ -26,12 +25,12 @@ function AddAssignment({
   const localize = useLocalize();
   const navigate = useNavigate();
   const [projectId, setProjectId] = useState('');
-  const [name, setName] = useState('');
-  const homeId = workspace.projects.find((p) => p.school?.courseId === assignment.courseId)?._id;
-  const projects = workspace.projects
-    .filter((p) => p.school?.kind !== 'course')
-    .sort((a, b) => Number(b.school?.homeId === homeId) - Number(a.school?.homeId === homeId));
-  const create = useWorkspaceMutation(MutationKeys.schoolProject, dataService.createSchoolProject);
+  const homeId = workspace.courses.find(
+    (p) => p.active && p.canvasCourseId === assignment.courseId,
+  )?.id;
+  const projects = [...workspace.projects].sort(
+    (a, b) => Number(b.school?.homeId === homeId) - Number(a.school?.homeId === homeId),
+  );
   const add = useWorkspaceMutation(
     MutationKeys.schoolSource,
     dataService.addSchoolProjectSource,
@@ -40,12 +39,10 @@ function AddAssignment({
       navigate(`/projects/${encodeURIComponent(project._id)}`);
     },
   );
-  const busy = create.isLoading || add.isLoading;
+  const busy = add.isLoading;
   async function submit() {
-    const homeId = workspace.projects.find((p) => p.school?.courseId === assignment.courseId)?._id;
     try {
-      const id = projectId || (await create.mutateAsync({ name: name.trim(), homeId }))._id;
-      await add.mutateAsync({ projectId: id, courseId: assignment.courseId, id: assignment.id });
+      await add.mutateAsync({ projectId, courseId: assignment.courseId, id: assignment.id });
     } catch {
       /* Mutation state supplies safe UI copy. */
     }
@@ -69,7 +66,7 @@ function AddAssignment({
             onChange={(e) => setProjectId(e.target.value)}
             disabled={busy}
           >
-            <option value="">{localize('com_school_new_project')}</option>
+            <option value="">{localize('com_school_select_existing')}</option>
             {projects.map((p) => (
               <option key={p._id} value={p._id}>
                 {p.name}
@@ -77,19 +74,12 @@ function AddAssignment({
             ))}
           </select>
         </label>
-        {!projectId && (
-          <label className="space-y-2">
-            <span>{localize('com_school_project_name')}</span>
-            <Input
-              value={name}
-              maxLength={100}
-              onChange={(e) => setName(e.target.value)}
-              disabled={busy}
-            />
-          </label>
-        )}
-        {(create.isError || add.isError) && <WorkspaceError error={create.error ?? add.error} />}
-        <Button disabled={busy || (!projectId && !name.trim())} onClick={() => void submit()}>
+        {projects.length === 0 && <p>{localize('com_school_no_existing_projects')}</p>}
+        <Link className="underline" to="/school/new" onClick={close}>
+          {localize('com_school_new_project')}
+        </Link>
+        {add.isError && <WorkspaceError error={add.error} />}
+        <Button disabled={busy || !projectId} onClick={() => void submit()}>
           {localize(busy ? 'com_school_workspace_saving' : 'com_school_add_assignment')}
         </Button>
       </OGDialogContent>
@@ -122,10 +112,10 @@ export default function SchoolDashboard() {
     );
   if (!query.data) return <WorkspaceLoading />;
   const workspace = query.data;
-  const courses = workspace.projects.filter((p) => p.school?.kind === 'course');
-  const courseIds = new Set(courses.map((course) => course._id));
+  const courses = workspace.courses;
+  const courseIds = new Set(courses.map((course) => course.id));
   const unfiled = workspace.projects.filter(
-    (p) => p.school?.kind !== 'course' && (!p.school?.homeId || !courseIds.has(p.school.homeId)),
+    (p) => !p.school?.homeId || !courseIds.has(p.school.homeId),
   );
   const choiceButtons = (
     <div className="flex flex-wrap gap-2">
@@ -237,7 +227,9 @@ export default function SchoolDashboard() {
                 disabled={chat.isLoading}
                 onClick={() =>
                   chat.mutate({
-                    projectId: courses.find((p) => p.school?.courseId === item.courseId)?._id,
+                    schoolCourseId: courses.find(
+                      (p) => p.active && p.canvasCourseId === item.courseId,
+                    )?.id,
                     assignment: { courseId: item.courseId, id: item.id },
                   })
                 }
@@ -264,18 +256,18 @@ export default function SchoolDashboard() {
         <div className="grid gap-3 md:grid-cols-2">
           {courses.map((course) => (
             <article
-              key={course._id}
+              key={course.id}
               className="border-border-light space-y-2 rounded-xl border p-4"
             >
               <Link
                 className="font-semibold underline"
-                to={`/projects/${encodeURIComponent(course._id)}`}
+                to={`/school/courses/${encodeURIComponent(course.id)}`}
               >
                 {course.name}
               </Link>
               <ul className="space-y-2 text-sm">
                 {workspace.projects
-                  .filter((p) => p.school?.homeId === course._id)
+                  .filter((p) => p.school?.homeId === course.id)
                   .map((p) => (
                     <li key={p._id}>
                       <Link className="underline" to={`/projects/${encodeURIComponent(p._id)}`}>
@@ -285,7 +277,7 @@ export default function SchoolDashboard() {
                   ))}
               </ul>
               <Button asChild size="sm" variant="ghost">
-                <Link to={`/school/new?homeId=${encodeURIComponent(course._id)}`}>
+                <Link to={`/school/new?homeId=${encodeURIComponent(course.id)}`}>
                   {localize('com_school_work_here')}
                 </Link>
               </Button>
@@ -305,7 +297,7 @@ export default function SchoolDashboard() {
             </article>
           ))}
         </div>
-        {workspace.projects.length === 0 && (
+        {workspace.projects.length === 0 && courses.length === 0 && (
           <p className="text-text-secondary">{localize('com_school_no_folders')}</p>
         )}
       </section>

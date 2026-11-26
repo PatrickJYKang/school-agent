@@ -3,16 +3,24 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { MutationKeys } from 'librechat-data-provider';
 import { useSchoolQuery } from '~/data-provider/School';
 
-export function useWorkspace() {
+export function useWorkspace(active = true) {
   const status = useSchoolQuery();
   const enabled = status.data?.workspace?.enabled === true;
   const workspace = useQuery([QueryKeys.schoolWorkspace], dataService.getSchoolWorkspace, {
-    enabled,
+    enabled: enabled && active,
     retry: false,
     staleTime: 60000,
     refetchInterval: (data) => data?.settings.refreshMs ?? false,
   });
   return { ...workspace, enabled, status };
+}
+
+export function useSchoolCourse(id?: string | null) {
+  return useQuery([QueryKeys.schoolCourse, id], () => dataService.getSchoolCourse(id!), {
+    enabled: Boolean(id),
+    retry: false,
+    staleTime: 60000,
+  });
 }
 
 export function useWorkspaceMutation<Input, Output>(
@@ -26,6 +34,7 @@ export function useWorkspaceMutation<Input, Output>(
     onSuccess: (output) => {
       for (const query of [
         QueryKeys.schoolWorkspace,
+        QueryKeys.schoolCourseChats,
         QueryKeys.projects,
         QueryKeys.project,
         QueryKeys.allConversations,

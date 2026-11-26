@@ -5,6 +5,7 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import type { SchoolWorkspace } from 'librechat-data-provider';
 import SchoolDestination from '../Destination';
 import SchoolDashboard from '../Dashboard';
+import SchoolCourse from '../Course';
 import SchoolLiveView from '../Live';
 
 const mockNewConversation = jest.fn();
@@ -28,6 +29,8 @@ jest.mock('librechat-data-provider', () => ({
     createSchoolProject: jest.fn(),
     createSchoolChat: jest.fn(),
     getSchoolLiveView: jest.fn(),
+    getSchoolCourse: jest.fn(),
+    getSchoolCourseChats: jest.fn(),
   },
 }));
 
@@ -35,6 +38,7 @@ const workspace: SchoolWorkspace = {
   choice: 'undecided',
   connected: true,
   projects: [],
+  courses: [],
   assignments: [],
   truncated: false,
   retrievedAt: '2026-11-25T12:00:00Z',
@@ -51,6 +55,7 @@ function mount(path: string, element: React.ReactElement) {
       <MemoryRouter initialEntries={[path]}>
         <Routes>
           <Route path="/school" element={element} />
+          <Route path="/school/courses/:courseId" element={element} />
           <Route path="/school/new" element={element} />
           <Route path="/school/view/:conversationId" element={element} />
           <Route path="/c/:id" element={<p>CHAT_OPENED</p>} />
@@ -107,7 +112,7 @@ it('shows incomplete assignment results as a failure with retry, rather than an 
 it('starts an assignment chat in the existing course folder through a separate action', async () => {
   (dataService.getSchoolWorkspace as jest.Mock).mockResolvedValue({
     ...workspace,
-    projects: [{ _id: 'course-home', name: 'History', school: { kind: 'course', courseId: '1' } }],
+    courses: [{ id: 'course-home', name: 'History', canvasCourseId: '1', active: true }],
     assignments: [
       {
         id: '2',
@@ -126,7 +131,7 @@ it('starts an assignment chat in the existing course folder through a separate a
   fireEvent.click(screen.getByRole('button', { name: 'com_school_assignment_chat' }));
   await screen.findByText('CHAT_OPENED');
   expect(dataService.createSchoolChat).toHaveBeenCalledWith({
-    projectId: 'course-home',
+    schoolCourseId: 'course-home',
     assignment: { courseId: '1', id: '2' },
   });
 });
@@ -163,7 +168,7 @@ it('creates a project only after submission and starts the native unsaved chat a
   expect(dataService.createSchoolProject).toHaveBeenCalledTimes(2);
   expect(dataService.createSchoolChat).not.toHaveBeenCalled();
   expect(mockNewConversation).toHaveBeenCalledWith({
-    template: { chatProjectId: 'saved-project' },
+    template: { chatProjectId: 'saved-project', schoolCourseId: null },
   });
 });
 
@@ -181,4 +186,95 @@ it('hides previously loaded viewer text when access is revoked during a refresh'
   });
   await screen.findByRole('alert');
   expect(screen.queryByText('Saved answer')).not.toBeInTheDocument();
+});
+
+it('starts a quick question in a course independently of the project destination', async () => {
+  (dataService.getSchoolWorkspace as jest.Mock).mockResolvedValue({
+    ...workspace,
+    courses: [{ id: 'course-id', name: 'History', canvasCourseId: '1' }],
+  });
+  mount('/school/new?homeId=course-id', <SchoolDestination />);
+  const select = await screen.findByRole('combobox');
+  expect(select).toHaveValue('course:course-id');
+  fireEvent.click(screen.getByRole('button', { name: 'com_school_start_chat' }));
+  await screen.findByText('CHAT_OPENED');
+  expect(mockNewConversation).toHaveBeenCalledWith({
+    template: { chatProjectId: null, schoolCourseId: 'course-id' },
+  });
+  expect(dataService.createSchoolProject).not.toHaveBeenCalled();
+  expect(dataService.createSchoolChat).not.toHaveBeenCalled();
+});
+
+it('links courses to their bespoke category and projects to LibreChat projects', async () => {
+  (dataService.getSchoolWorkspace as jest.Mock).mockResolvedValue({
+    ...workspace,
+    courses: [{ id: 'course-id', name: 'History', canvasCourseId: '1' }],
+    projects: [
+      { _id: 'project-id', name: 'Research', school: { kind: 'project', homeId: 'course-id' } },
+    ],
+  });
+  mount('/school', <SchoolDashboard />);
+  expect(await screen.findByRole('link', { name: 'History' })).toHaveAttribute(
+    'href',
+    '/school/courses/course-id',
+  );
+  expect(screen.getByRole('link', { name: 'Research' })).toHaveAttribute(
+    'href',
+    '/projects/project-id',
+  );
+});
+
+it('offers only existing projects in the assignment action and does not create an empty project', async () => {
+  (dataService.getSchoolWorkspace as jest.Mock).mockResolvedValue({
+    ...workspace,
+    assignments: [
+      {
+        id: '2',
+        courseId: '1',
+        course: 'History',
+        title: 'Essay',
+        url: 'https://school.instructure.com/courses/1/assignments/2',
+      },
+    ],
+  });
+  mount('/school', <SchoolDashboard />);
+  fireEvent.click(await screen.findByRole('button', { name: 'com_school_add_assignment' }));
+  expect(screen.getByRole('combobox').children).toHaveLength(1);
+  expect(screen.getByText('com_school_no_existing_projects')).toBeInTheDocument();
+  expect(screen.queryByLabelText('com_school_project_name')).not.toBeInTheDocument();
+  expect(dataService.createSchoolProject).not.toHaveBeenCalled();
+});
+
+it('renders the course home with direct chats, child projects, and a retriable chat read failure', async () => {
+  (dataService.getSchoolCourse as jest.Mock).mockResolvedValue({
+    id: 'course-id',
+    name: 'History',
+    canvasCourseId: '1',
+  });
+  (dataService.getSchoolWorkspace as jest.Mock).mockResolvedValue({
+    ...workspace,
+    projects: [
+      { _id: 'project-id', name: 'Research', school: { kind: 'project', homeId: 'course-id' } },
+    ],
+  });
+  (dataService.getSchoolCourseChats as jest.Mock)
+    .mockRejectedValueOnce(new Error('Offline'))
+    .mockResolvedValueOnce({
+      chats: [
+        { conversationId: 'chat-id', title: 'Quick question', updatedAt: '2026-11-25T12:00:00Z' },
+      ],
+      nextCursor: null,
+    });
+  mount('/school/courses/course-id', <SchoolCourse />);
+  expect(await screen.findByRole('heading', { name: 'History' })).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: 'Research' })).toHaveAttribute(
+    'href',
+    '/projects/project-id',
+  );
+  await screen.findByRole('alert');
+  fireEvent.click(screen.getByRole('button', { name: 'com_school_workspace_retry' }));
+  expect(await screen.findByRole('link', { name: 'Quick question' })).toHaveAttribute(
+    'href',
+    '/c/chat-id',
+  );
 });

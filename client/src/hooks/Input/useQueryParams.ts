@@ -101,6 +101,7 @@ export default function useQueryParams({
   const requestIdentity = useMemo(() => {
     const params = new URLSearchParams(searchIdentity);
     params.delete(PROJECT_ID_SEARCH_PARAM);
+    params.delete('courseId');
     return params.toString();
   }, [searchIdentity]);
   const previousRequestIdentityRef = useRef(requestIdentity);
@@ -108,6 +109,7 @@ export default function useQueryParams({
     pathname: location.pathname,
     search: searchIdentity,
     projectId: searchParams.get(PROJECT_ID_SEARCH_PARAM),
+    courseId: searchParams.get('courseId'),
   };
   const originRouteRef = useRef(route);
   const routeRef = useRef(route);
@@ -116,6 +118,7 @@ export default function useQueryParams({
   const destinationRef = useRef<{
     conversationId: string;
     chatProjectId: TConversation['chatProjectId'];
+    schoolCourseId: TConversation['schoolCourseId'];
     route: typeof route;
   } | null>(null);
   const cancelledRef = useRef(false);
@@ -139,6 +142,7 @@ export default function useQueryParams({
     if (projectId) {
       preservedParams.set(PROJECT_ID_SEARCH_PARAM, projectId);
     }
+    if (routeRef.current.courseId) preservedParams.set('courseId', routeRef.current.courseId);
     return preservedParams;
   }, []);
 
@@ -162,17 +166,22 @@ export default function useQueryParams({
     const current = routeRef.current;
     return (
       ((current.projectId === originRouteRef.current.projectId &&
+        current.courseId === originRouteRef.current.courseId &&
         current.pathname === originRouteRef.current.pathname) ||
         (destinationRef.current != null &&
           current.pathname === destinationRef.current.route.pathname &&
-          current.projectId === destinationRef.current.route.projectId)) &&
+          current.projectId === destinationRef.current.route.projectId &&
+          current.courseId === destinationRef.current.route.courseId)) &&
       (!processedRef.current ||
         currentId == null ||
         currentId === originConversationRef.current ||
         currentId === destinationRef.current?.conversationId) &&
       (destinationRef.current == null ||
         currentId !== destinationRef.current.conversationId ||
-        (conversationRef.current?.chatProjectId ?? null) === destinationRef.current.chatProjectId)
+        ((conversationRef.current?.chatProjectId ?? null) ===
+          destinationRef.current.chatProjectId &&
+          (conversationRef.current?.schoolCourseId ?? null) ===
+            destinationRef.current.schoolCourseId))
     );
   }, []);
 
@@ -194,6 +203,9 @@ export default function useQueryParams({
     const conversationId = template.conversationId ?? 'new';
     const params = new URLSearchParams(originRouteRef.current.search);
     params.delete(PROJECT_ID_SEARCH_PARAM);
+    params.delete('courseId');
+    const courseId = conversationId === 'new' ? template.schoolCourseId || null : null;
+    if (courseId) params.set('courseId', courseId);
     const projectId = conversationId === 'new' ? template.chatProjectId || null : null;
     if (projectId) {
       params.set(PROJECT_ID_SEARCH_PARAM, projectId);
@@ -202,7 +214,8 @@ export default function useQueryParams({
     destinationRef.current = {
       conversationId,
       chatProjectId: template.chatProjectId ?? null,
-      route: { pathname: `/c/${conversationId}`, search: params.toString(), projectId },
+      schoolCourseId: template.schoolCourseId ?? null,
+      route: { pathname: `/c/${conversationId}`, search: params.toString(), projectId, courseId },
     };
   }, []);
 
@@ -412,6 +425,7 @@ export default function useQueryParams({
 
       const newTemplate = {
         chatProjectId: conversation?.chatProjectId ?? null,
+        schoolCourseId: conversation?.schoolCourseId ?? null,
         ...(newPreset.agent_id ? { agent_id: newPreset.agent_id } : {}),
       };
       expectDestination(newTemplate);

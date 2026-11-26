@@ -166,6 +166,7 @@ export function createSchoolWorkspaceRouter(
         choice,
         ...(connectionFailed ? { assignmentsError: 'workspace_unavailable' } : {}),
         projects: [],
+        courses: [],
         truncated: false,
         connected: connected.client !== null,
         assignments: [],
@@ -213,13 +214,57 @@ export function createSchoolWorkspaceRouter(
           response.assignmentsError = 'workspace_unavailable';
         }
       }
-      const listed = await store.listSchoolProjects(owner, settings.maxProjects);
-      response.projects = listed.projects.filter(
-        (p) =>
-          connectionFailed || p.school?.kind !== 'course' || p.school.scope === connected.scope,
+      const listedCourses = await store.listSchoolCourses(
+        owner,
+        settings.maxCourses,
+        connected.client ? connected.scope : undefined,
       );
+      response.courses = listedCourses.courses;
+      response.truncated ||= listedCourses.truncated;
+      const listed = await store.listSchoolProjects(owner, settings.maxProjects);
+      response.projects = listed.projects;
       response.truncated ||= listed.truncated;
       res.json(response);
+    }),
+  );
+  router.get(
+    '/courses/:id',
+    handle(async (req, res) => {
+      const context = await access(req);
+      if (!objectId.safeParse(req.params.id).success) {
+        res.status(400).json({ code: 'workspace_invalid' });
+        return;
+      }
+      const course = await store.getSchoolCourse(context.owner, String(req.params.id));
+      if (!course) {
+        res.sendStatus(404);
+        return;
+      }
+      res.json(course);
+    }),
+  );
+  router.get(
+    '/courses/:id/chats',
+    handle(async (req, res) => {
+      const context = await access(req);
+      const input = z
+        .object({ id: objectId, cursor: objectId.optional() })
+        .safeParse({ id: req.params.id, cursor: req.query.cursor });
+      if (!input.success) {
+        res.status(400).json({ code: 'workspace_invalid' });
+        return;
+      }
+      const result = await store.listSchoolCourseChats(
+        context.owner,
+        input.data.id,
+        context.settings.courseChatPageSize,
+        input.data.cursor,
+      );
+      if (!result) {
+        res.sendStatus(404);
+        return;
+      }
+      res.json(result);
     }),
   );
   router.put(
@@ -332,6 +377,7 @@ export function createSchoolWorkspaceRouter(
       const input = z
         .object({
           projectId: objectId.optional(),
+          schoolCourseId: objectId.optional(),
           assignment: selection.optional(),
         })
         .strict()
@@ -346,6 +392,20 @@ export function createSchoolWorkspaceRouter(
       ) {
         res.sendStatus(404);
         return;
+      }
+      if (input.data.schoolCourseId) {
+        if (input.data.projectId) {
+          res.status(400).json({ code: 'workspace_invalid' });
+          return;
+        }
+        const course = await store.getSchoolCourse(context.owner, input.data.schoolCourseId);
+        if (
+          !course ||
+          (input.data.assignment && input.data.assignment.courseId !== course.canvasCourseId)
+        ) {
+          res.sendStatus(404);
+          return;
+        }
       }
       const material = input.data.assignment ? await source(context, input.data.assignment) : null;
       const spec =
@@ -365,6 +425,7 @@ export function createSchoolWorkspaceRouter(
       const conversationId = await store.createSchoolChat(context.owner, {
         title: material?.title ?? 'New Chat',
         projectId: input.data.projectId,
+        schoolCourseId: input.data.schoolCourseId,
         context: material?.markdown,
         preset,
         retention: preset.isTemporary

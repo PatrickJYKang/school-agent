@@ -232,14 +232,14 @@ function getConversationQueryProjectId(queryKey: readonly unknown[]): string | u
 
 function conversationMatchesProjectQuery(
   queryKey: readonly unknown[],
-  conversation: Pick<TConversation, 'chatProjectId'>,
+  conversation: Pick<TConversation, 'chatProjectId' | 'schoolCourseId'>,
 ): boolean {
   const projectId = getConversationQueryProjectId(queryKey);
   if (!projectId) {
     return true;
   }
   if (projectId === 'unassigned') {
-    return !conversation.chatProjectId;
+    return !conversation.chatProjectId && !conversation.schoolCourseId;
   }
   return conversation.chatProjectId === projectId;
 }

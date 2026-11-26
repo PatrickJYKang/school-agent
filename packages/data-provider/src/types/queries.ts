@@ -51,6 +51,7 @@ export type MinimalConversation = Pick<
   | 'isArchived'
   | 'user'
   | 'chatProjectId'
+  | 'schoolCourseId'
   | 'pinned'
   | 'lastResponseAt'
   | 'lastResponseMessageId'

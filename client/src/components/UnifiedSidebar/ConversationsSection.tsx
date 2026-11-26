@@ -34,6 +34,7 @@ import useSidebarToggle from '~/hooks/Nav/useSidebarToggle';
 import { Conversations } from '~/components/Conversations';
 import { cn, collectPinnedConversations } from '~/utils';
 import SearchBar from '~/components/Nav/SearchBar';
+import Courses from '~/components/School/Courses';
 import store from '~/store';
 
 const chatsHeaderTrailing = <ChatFilterMenu />;
@@ -244,6 +245,7 @@ const ConversationsSection = memo(() => {
               {!search.query && (
                 <>
                   <SchoolHomeLink />
+                  <Courses toggleNav={toggleNav} />
                   <ProjectsSection toggleNav={toggleNav} isAuthenticated={isAuthenticated} />
                 </>
               )}

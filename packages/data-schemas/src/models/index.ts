@@ -1,5 +1,6 @@
 import { createAgentQueuedTurnModel, createAgentQueuedTurnSequenceModel } from './queuedTurn';
 import { createAgentTriggerLaneSequenceModel } from './triggerLaneSequence';
+import { createSchoolStateModel, createSchoolCourseModel } from './school';
 import { createScheduleModel, createScheduleRunModel } from './schedule';
 import { getTenantIndexMigrationHint } from '~/migrations/tenantIndexes';
 import { createSkillSyncCredentialModel } from './skillSyncCredential';
@@ -28,7 +29,6 @@ import { createToolFavoriteModel } from './favorite';
 import { createMCPServerModel } from './mcpServer';
 import { createAssistantModel } from './assistant';
 import { createSkillFileModel } from './skillFile';
-import { createSchoolStateModel } from './school';
 import { createConversationModel } from './convo';
 import { createToolCallModel } from './toolCall';
 import { createAclEntryModel } from './aclEntry';
@@ -66,6 +66,7 @@ export function createModels(mongoose: typeof import('mongoose')): {
   Conversation: ReturnType<typeof createConversationModel>;
   ChatProject: ReturnType<typeof createChatProjectModel>;
   SchoolState: ReturnType<typeof createSchoolStateModel>;
+  SchoolCourse: ReturnType<typeof createSchoolCourseModel>;
   CodeEnvironment: ReturnType<typeof createCodeEnvironmentModel>;
   Message: ReturnType<typeof createMessageModel>;
   SubagentContent: ReturnType<typeof createSubagentContentModel>;
@@ -122,6 +123,7 @@ export function createModels(mongoose: typeof import('mongoose')): {
     Conversation: createConversationModel(mongoose),
     ChatProject: createChatProjectModel(mongoose),
     SchoolState: createSchoolStateModel(mongoose),
+    SchoolCourse: createSchoolCourseModel(mongoose),
     CodeEnvironment: createCodeEnvironmentModel(mongoose),
     Message: createMessageModel(mongoose),
     SubagentContent: createSubagentContentModel(mongoose),

@@ -130,6 +130,7 @@ const useNewConvo = (index = 0) => {
           'chatProjectId',
         );
         const explicitChatProjectId = conversation.chatProjectId;
+        const explicitSchoolCourseId = conversation.schoolCourseId;
         const activePreset =
           // use default preset only when it's defined,
           // preset is not provided,
@@ -241,6 +242,7 @@ const useNewConvo = (index = 0) => {
             defaultParamsEndpoint,
           });
 
+          conversation.schoolCourseId = explicitSchoolCourseId ?? null;
           if (hasExplicitChatProjectId) {
             conversation.chatProjectId = explicitChatProjectId ?? null;
           } else {
@@ -278,6 +280,12 @@ const useNewConvo = (index = 0) => {
         const getParams = (nextConversation: TConversation) => {
           const nextParams = new URLSearchParams(searchParams);
           nextParams.delete('projectId');
+          nextParams.delete('courseId');
+          if (
+            nextConversation.conversationId === Constants.NEW_CONVO &&
+            nextConversation.schoolCourseId
+          )
+            nextParams.set('courseId', nextConversation.schoolCourseId);
           if (
             nextConversation.conversationId === Constants.NEW_CONVO &&
             nextConversation.chatProjectId
@@ -350,7 +358,11 @@ const useNewConvo = (index = 0) => {
         isParamEndpoint(_preset?.endpoint ?? '', _preset?.endpointType ?? '');
       const template =
         paramEndpoint === true && templateConvoId && templateConvoId === Constants.NEW_CONVO
-          ? { endpoint: _template.endpoint, chatProjectId: _template.chatProjectId }
+          ? {
+              endpoint: _template.endpoint,
+              chatProjectId: _template.chatProjectId,
+              schoolCourseId: _template.schoolCourseId,
+            }
           : _template;
 
       let conversation = {
@@ -371,7 +383,9 @@ const useNewConvo = (index = 0) => {
           : startupConfig?.modelSpecs?.prioritize === true ||
             (startupConfig?.interface?.modelSelect ?? true) !== true ||
             (result?.last != null &&
-              Object.keys(_template).filter((key) => key !== 'chatProjectId').length === 0);
+              Object.keys(_template).filter(
+                (key) => key !== 'chatProjectId' && key !== 'schoolCourseId',
+              ).length === 0);
       if (!preset && startupConfig && shouldApplyModelSpec && defaultModelSpec) {
         preset = getModelSpecPreset(defaultModelSpec);
       }

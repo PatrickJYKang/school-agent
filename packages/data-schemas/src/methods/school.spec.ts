@@ -1,8 +1,10 @@
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import type { SchoolSource } from 'librechat-data-provider';
+import { tenantStorage } from '~/config/tenantContext';
 import { createSchoolMethods } from './school';
 import { createUserMethods } from './user';
+import { createMethods } from './index';
 import { createModels } from '~/models';
 
 jest.mock('~/config/winston', () => ({
@@ -33,10 +35,11 @@ beforeAll(async () => {
   await mongoose.connect(mongo.getUri(), { autoIndex: false, autoCreate: false });
   await mongoose.models.ChatProject.createIndexes();
   await mongoose.models.SchoolState.createIndexes();
+  await mongoose.models.SchoolCourse.createIndexes();
 }, 60000);
 afterEach(async () => {
   await Promise.all(
-    ['ChatProject', 'Conversation', 'Message', 'SchoolState', 'User'].map((name) =>
+    ['ChatProject', 'Conversation', 'Message', 'SchoolState', 'SchoolCourse', 'User'].map((name) =>
       mongoose.models[name].deleteMany({}),
     ),
   );
@@ -63,20 +66,142 @@ it('persists choices per user, institution and verified Canvas account', async (
   expect(await methods.getSchoolChoice(owner, scope)).toBe('allowed');
 });
 
-it('syncs course roots idempotently without creating assignment projects or chats', async () => {
+it('syncs distinct courses without creating native projects or chats, with owner and tenant isolation', async () => {
   await methods.syncSchoolCourses(owner, scope, [{ id: '1', name: 'History' }]);
-  const first = (await methods.listSchoolProjects(owner, 20)).projects[0];
+  const first = (await methods.listSchoolCourses(owner, 20)).courses[0];
   await methods.syncSchoolCourses(owner, scope, [{ id: '1', name: 'History renamed' }]);
-  const second = await methods.listSchoolProjects(owner, 20);
-  expect(second.projects).toHaveLength(1);
-  expect(second.projects[0]).toMatchObject({
-    _id: first._id,
-    name: 'History renamed',
-    school: { kind: 'course', courseId: '1' },
-  });
+  const second = await methods.listSchoolCourses(owner, 20);
+  expect(second.courses).toEqual([{ ...first, name: 'History renamed' }]);
+  expect((await methods.listSchoolProjects(owner, 20)).projects).toEqual([]);
   expect(await mongoose.models.Conversation.countDocuments()).toBe(0);
-  expect(await methods.createSchoolProject(other, 'Foreign home', first._id)).toBeNull();
-  expect(await methods.getSchoolProject({ ...owner, tenantId: 'school-b' }, first._id)).toBeNull();
+  expect(await methods.createSchoolProject(other, 'Foreign home', first.id)).toBeNull();
+  expect(await methods.getSchoolCourse({ ...owner, tenantId: 'school-b' }, first.id)).toBeNull();
+  const project = (await methods.createSchoolProject(owner, 'Research', first.id))!;
+  expect(project.school).toMatchObject({ kind: 'project', homeId: first.id });
+});
+
+it('migrates legacy course projects idempotently while preserving existing chat context and children', async () => {
+  const legacy = await mongoose.models.ChatProject.create({
+    ...owner,
+    name: 'History',
+    instructions: 'Keep these instructions',
+    file_ids: ['file-a'],
+    contextRevision: 7,
+    school: { kind: 'course', scope, courseId: '1' },
+  });
+  const child = await mongoose.models.ChatProject.create({
+    ...owner,
+    name: 'Research',
+    school: { kind: 'project', homeId: String(legacy._id) },
+  });
+  const chat = await methods.createSchoolChat(owner, {
+    title: 'Previous work',
+    projectId: String(legacy._id),
+    preset: { endpoint: 'openAI' },
+  });
+  const course = (await methods.listSchoolCourses(owner, 20)).courses[0];
+  await methods.listSchoolCourses(owner, 20);
+  expect(course.id).toBe(String(legacy._id));
+  expect(await mongoose.models.SchoolCourse.countDocuments()).toBe(1);
+  expect(await methods.getSchoolProject(owner, String(legacy._id))).toMatchObject({
+    instructions: 'Keep these instructions',
+    contextRevision: 7,
+    school: { kind: 'project', homeId: course.id },
+  });
+  expect((await mongoose.models.ChatProject.findById(legacy._id)).file_ids).toEqual(['file-a']);
+  expect((await methods.getSchoolProject(owner, String(child._id)))?.school?.homeId).toBe(
+    course.id,
+  );
+  expect(await mongoose.models.Conversation.findOne({ conversationId: chat })).toMatchObject({
+    chatProjectId: String(legacy._id),
+  });
+});
+
+it('files native first-send chats in courses without projects and never moves them through later turn saves', async () => {
+  await methods.syncSchoolCourses(owner, scope, [{ id: '1', name: 'History' }]);
+  const course = (await methods.listSchoolCourses(owner, 20)).courses[0];
+  const native = createMethods(mongoose);
+  await tenantStorage.run({ tenantId: owner.tenantId }, async () =>
+    native.saveConvo(
+      { userId: owner.user },
+      {
+        conversationId: 'native-course',
+        tenantId: owner.tenantId,
+        schoolCourseId: course.id,
+        title: 'First question',
+      },
+      { appendMessageIds: [] },
+    ),
+  );
+  const saved = await mongoose.models.Conversation.findOne({ conversationId: 'native-course' });
+  expect(saved.schoolCourseId).toBe(course.id);
+  expect(saved.chatProjectId).toBeNull();
+  await tenantStorage.run({ tenantId: owner.tenantId }, async () =>
+    native.saveConvo(
+      { userId: owner.user },
+      {
+        conversationId: 'native-course',
+        tenantId: owner.tenantId,
+        schoolCourseId: null,
+        title: 'Updated title',
+      },
+      { appendMessageIds: [] },
+    ),
+  );
+  expect((await methods.listSchoolCourseChats(owner, course.id, 1))?.chats[0].title).toBe(
+    'Updated title',
+  );
+  expect(
+    (await native.getConvosByCursor(owner.user, { projectId: 'unassigned' })).conversations,
+  ).toHaveLength(0);
+  await tenantStorage.run({ tenantId: owner.tenantId }, async () =>
+    native.saveConvo(
+      { userId: other.user },
+      { conversationId: 'foreign', tenantId: other.tenantId, schoolCourseId: course.id },
+      { appendMessageIds: [] },
+    ),
+  );
+  expect(
+    (await mongoose.models.Conversation.findOne({ conversationId: 'foreign' })).schoolCourseId,
+  ).toBeNull();
+});
+
+it('paginates course chats without admitting archived, temporary, expired, project or foreign work', async () => {
+  await methods.syncSchoolCourses(owner, scope, [{ id: '1', name: 'History' }]);
+  const course = (await methods.listSchoolCourses(owner, 20)).courses[0];
+  for (const title of ['First', 'Second', 'Third'])
+    await methods.createSchoolChat(owner, {
+      title,
+      schoolCourseId: course.id,
+      preset: { endpoint: 'openAI' },
+    });
+  await mongoose.models.Conversation.create(
+    [
+      {
+        ...owner,
+        conversationId: 'expired',
+        schoolCourseId: course.id,
+        expiredAt: new Date(0),
+        isTemporary: false,
+      },
+      { ...owner, conversationId: 'archived', schoolCourseId: course.id, isArchived: true },
+      { ...owner, conversationId: 'temporary', schoolCourseId: course.id, isTemporary: true },
+      { ...owner, conversationId: 'project', schoolCourseId: course.id, chatProjectId: 'project' },
+      { ...other, conversationId: 'foreign', schoolCourseId: course.id },
+    ].map((row) => ({ ...row, endpoint: 'openAI' })),
+  );
+  const first = (await methods.listSchoolCourseChats(owner, course.id, 2))!;
+  const next = (await methods.listSchoolCourseChats(owner, course.id, 2, first.nextCursor!))!;
+  expect([...first.chats, ...next.chats].map((chat) => chat.title).sort()).toEqual([
+    'First',
+    'Second',
+    'Third',
+  ]);
+  expect(next.nextCursor).toBeNull();
+  expect(await methods.listSchoolCourseChats(other, course.id, 10)).toBeNull();
+  expect(
+    await methods.listSchoolCourseChats({ ...owner, tenantId: 'school-b' }, course.id, 10),
+  ).toBeNull();
 });
 
 it('keeps multiple assignment sources across concurrent imports and revisions', async () => {
@@ -193,6 +318,7 @@ it('removes folder preferences and named viewer grants when an account is delete
   });
   const recipient = { user: String(viewer._id), tenantId: owner.tenantId };
   await methods.setSchoolChoice(recipient, scope, 'allowed');
+  await methods.syncSchoolCourses(recipient, scope, [{ id: '1', name: 'History' }]);
   const id = (await methods.createSchoolChat(owner, {
     title: 'Study',
     preset: { endpoint: 'openAI' },
@@ -200,6 +326,7 @@ it('removes folder preferences and named viewer grants when an account is delete
   await methods.grantSchoolViewer(owner, id, viewer.email, 20);
   await createUserMethods(mongoose).deleteUserById(recipient.user);
   expect(await methods.getSchoolChoice(recipient, scope)).toBe('undecided');
+  expect((await methods.listSchoolCourses(recipient, 20)).courses).toEqual([]);
   expect(await methods.getSchoolViewers(owner, id)).toEqual([]);
   const saved = await mongoose.models.Conversation.findOne({ conversationId: id })
     .select('+schoolViewers')
@@ -243,4 +370,12 @@ it('projects bounded public text, excluding files, reasoning, tools and expired 
   expect(JSON.stringify(rows)).not.toMatch(/PRIVATE|private-file|EXPIRED|FOREIGN/);
   await mongoose.models.Message.updateOne({ messageId: 'a' }, { $set: { text: 'Changed answer' } });
   expect((await methods.readSchoolMessages(owner, conversationId, 1, 7))[0].text).toBe('Changed');
+});
+
+it('distinguishes courses on a previous Canvas account that reused the same course ID', async () => {
+  await methods.syncSchoolCourses(owner, scope, [{ id: '1', name: 'History' }]);
+  await methods.syncSchoolCourses(owner, `${scope}-second`, [{ id: '1', name: 'Science' }]);
+  const rows = await methods.listSchoolCourses(owner, 20, `${scope}-second`);
+  expect(rows.courses.find((course) => course.name === 'History')?.active).toBe(false);
+  expect(rows.courses.find((course) => course.name === 'Science')?.active).toBe(true);
 });

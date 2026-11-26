@@ -25,7 +25,7 @@ reference messages receive the effective chat-retention deadline.
   disconnected, partial, bounded and failed reads have distinct states.
 - Allow/Don't allow is stored per user, tenant and verified Canvas account/site.
   Until answered the prompt remains visible. Change it on the dashboard. Course
-  sync creates or renames personal native project records marked as course roots;
+  sync creates or renames dedicated `SchoolCourse` records, separate from native projects;
   it never deletes work or creates a project/chat per assignment. A Canvas outage
   leaves ordinary project work available and does not reset consent.
 - `/school/new` is the generic destination picker, including course roots,
@@ -58,8 +58,18 @@ so granting access still discloses the visible conversation. Explicit attachment
 admission/download permissions remain unfinished. Viewer discovery/invitations,
 mail notifications and simultaneous multi-person chat are not implemented.
 
-Course/project hierarchy is shown on the dashboard and inside a course. Native
-LibreChat's general project list remains flat. The dashboard imports the bounded
+Courses have their own sidebar category and `/school/courses/:courseId` page, listing
+direct course chats and child projects. LibreChat's Projects list contains actual
+projects only and remains flat. Direct course chats persist `schoolCourseId`, with no
+`chatProjectId`; the ordinary unfiled Chats list excludes them. Search and the archived
+view can still find them. Quick questions use the native unsaved composer and receive
+a title after the first message.
+
+Legacy course projects migrate to dedicated courses when the dashboard loads. Their
+original records remain as ordinary child projects under the course, preserving
+chat IDs, instructions, files and context revisions. Existing child projects retain
+their course home. This is idempotent; syncing never deletes historical work. Turning
+sync off stops course creation and name refresh but leaves existing work accessible. The dashboard imports the bounded
 assignment list supported by the current Canvas connector; completeness of
 individual differentiated due dates still needs evaluation against real courses.
 No submission/grade state is inferred. Project assignment imports do not crawl
@@ -84,7 +94,7 @@ Show upcoming assignments with course, title, due date and distinct actions:
 - **Open in Canvas** opens the authoritative assignment page.
 - **Start chat** opens a chat with that assignment's admitted context and files
   the chat directly under its course folder, without creating a project.
-- **Add to project** selects an existing personal project and adds the assignment
+- **Add to existing project** selects an existing personal project and adds the assignment
   to that project's common context. Offer projects in the course first, with a
   way to select another course's project or an unfiled project.
 
@@ -205,7 +215,7 @@ sharing precedents but do not implement the requested live view.
    inside a project derives its course home from that project.
 2. Build the dashboard and destination picker on those contracts. Bound and cache
    course/assignment reads without serial per-assignment startup queries.
-3. Connect Add to project to shared assignment context and verify it across new
+3. Connect Add to existing project to shared assignment context and verify it across new
    and existing chats. Extend source admission deliberately rather than allowing
    arbitrary model-supplied file or assignment IDs.
 4. Add explicit conversation-view grants and an authorized latest-chat read/update

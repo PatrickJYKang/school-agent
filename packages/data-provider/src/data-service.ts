@@ -14,9 +14,15 @@ import type {
   CanvasContext,
   CanvasSelection,
 } from './school';
+import type {
+  SchoolWorkspace,
+  SchoolViewer,
+  SchoolLiveView,
+  SchoolCourseChats,
+  SchoolCourse,
+} from './workspace';
 import type { TInsightsAccessResponse, TInsightsParams, TInsightsResponse } from './types/insights';
 import type { ScheduleMCPConsentView, ConfirmScheduleMCPConsent } from './types/scheduleConsent';
-import type { SchoolWorkspace, SchoolViewer, SchoolLiveView } from './workspace';
 import type { CodeSetupAttempt, CodeSetupApprovalRequest } from './codeSetup';
 import type { SchoolBrowserState } from './browser';
 import type { TFileConfig } from './file-config';
@@ -43,6 +49,14 @@ import request from './request';
 export const getSchoolStatus = (): Promise<SchoolStatus> => request.get(endpoints.school());
 export const getSchoolWorkspace = (): Promise<SchoolWorkspace> =>
   request.get(endpoints.school('/workspace'));
+export const getSchoolCourse = (id: string): Promise<SchoolCourse> =>
+  request.get(endpoints.school(`/workspace/courses/${encodeURIComponent(id)}`));
+export const getSchoolCourseChats = (id: string, cursor?: string): Promise<SchoolCourseChats> =>
+  request.get(
+    endpoints.school(
+      `/workspace/courses/${encodeURIComponent(id)}/chats${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ''}`,
+    ),
+  );
 export const setSchoolFolderChoice = (choice: 'allowed' | 'denied'): Promise<{ choice: string }> =>
   request.put(endpoints.school('/workspace/choice'), { choice });
 export const createSchoolProject = (input: {
@@ -70,6 +84,7 @@ export const removeSchoolProjectSource = (input: {
   );
 export const createSchoolChat = (input: {
   projectId?: string;
+  schoolCourseId?: string;
   assignment?: { courseId: string; id: string };
 }): Promise<{ conversationId: string }> =>
   request.post(endpoints.school('/workspace/chats'), input);

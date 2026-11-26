@@ -2,13 +2,17 @@ import { randomUUID } from 'node:crypto';
 import { Constants } from 'librechat-data-provider';
 import type {
   SchoolChatPreset,
+  SchoolCourse,
+  SchoolCourseChats,
   SchoolFolderChoice,
   SchoolSource,
   SchoolViewer,
   TChatProject,
 } from 'librechat-data-provider';
 import type { Model } from 'mongoose';
+import type { SchoolCourseRecord } from '~/models/school';
 import type { IChatProjectDocument } from '~/types';
+import { buildRetentionVisibilityFilter } from '~/utils/retention';
 import { tenantSafeBulkWrite } from '~/utils/tenantBulkWrite';
 import { isValidObjectIdString } from '~/utils/objectId';
 
@@ -37,6 +41,18 @@ export interface SchoolMethods {
     limit: number,
   ): Promise<{ projects: TChatProject[]; truncated: boolean }>;
   getSchoolProject(owner: SchoolOwner, id: string): Promise<TChatProject | null>;
+  listSchoolCourses(
+    owner: SchoolOwner,
+    limit: number,
+    scope?: string,
+  ): Promise<{ courses: SchoolCourse[]; truncated: boolean }>;
+  getSchoolCourse(owner: SchoolOwner, id: string): Promise<SchoolCourse | null>;
+  listSchoolCourseChats(
+    owner: SchoolOwner,
+    id: string,
+    limit: number,
+    cursor?: string,
+  ): Promise<SchoolCourseChats | null>;
   syncSchoolCourses(
     owner: SchoolOwner,
     scope: string,
@@ -76,6 +92,7 @@ export interface SchoolMethods {
     input: {
       title: string;
       projectId?: string;
+      schoolCourseId?: string;
       context?: string;
       retention?: { isTemporary?: boolean; expiredAt?: Date };
       preset: SchoolChatPreset;
@@ -100,6 +117,7 @@ export interface SchoolMethods {
 
 export function createSchoolMethods(mongoose: typeof import('mongoose')): SchoolMethods {
   const projects = () => mongoose.models.ChatProject as Model<IChatProjectDocument>;
+  const courses = () => mongoose.models.SchoolCourse as Model<SchoolCourseRecord>;
   const states = () => mongoose.models.SchoolState as Model<SchoolState>;
   const ownerFilter = ({ user, tenantId }: SchoolOwner) => ({ user, tenantId: tenantId ?? null });
   const projectFilter = (owner: SchoolOwner, id: string) => ({
@@ -120,7 +138,103 @@ export function createSchoolMethods(mongoose: typeof import('mongoose')): School
   async function findProject(owner: SchoolOwner, id: string) {
     return projects().findOne(projectFilter(owner, id));
   }
+  const courseView = (row: SchoolCourseRecord & { _id: { toString(): string } }): SchoolCourse => ({
+    id: row._id.toString(),
+    name: row.name,
+    canvasCourseId: row.canvasCourseId,
+  });
+  // Keep old course workspaces as ordinary child projects: this preserves instructions,
+  // files, chat IDs and context revisions without silently changing any agent's context.
+  async function migrateCourses(owner: SchoolOwner) {
+    const legacy = await projects()
+      .find({ ...ownerFilter(owner), 'school.kind': 'course' })
+      .select('_id school name');
+    for (const row of legacy) {
+      if (!row.school?.scope || !row.school.courseId) continue;
+      const course = await courses().findOneAndUpdate(
+        { ...ownerFilter(owner), scope: row.school.scope, canvasCourseId: row.school.courseId },
+        { $setOnInsert: { _id: row._id, name: row.name } },
+        { upsert: true, new: true },
+      );
+      const id = String(course._id);
+      await projects().updateMany(
+        { ...ownerFilter(owner), 'school.homeId': String(row._id) },
+        { $set: { 'school.homeId': id } },
+      );
+      await projects().updateOne(
+        { ...projectFilter(owner, String(row._id)), 'school.kind': 'course' },
+        { $set: { 'school.kind': 'project', 'school.homeId': id } },
+      );
+    }
+  }
   return {
+    async listSchoolCourses(owner, limit, scope) {
+      await migrateCourses(owner);
+      const rows = await courses()
+        .find(ownerFilter(owner))
+        .sort({ name: 1, _id: 1 })
+        .limit(limit + 1);
+      return {
+        courses: rows.slice(0, limit).map((row) => ({
+          ...courseView(row),
+          ...(scope ? { active: row.scope === scope } : {}),
+        })),
+        truncated: rows.length > limit,
+      };
+    },
+    async getSchoolCourse(owner, id) {
+      const row = await courses().findOne(projectFilter(owner, id));
+      return row ? courseView(row) : null;
+    },
+    async listSchoolCourseChats(owner, id, limit, cursor) {
+      if (!(await courses().exists(projectFilter(owner, id)))) return null;
+      const filter = {
+        ...ownerFilter(owner),
+        schoolCourseId: id,
+        chatProjectId: null,
+        isArchived: { $ne: true },
+        $and: [buildRetentionVisibilityFilter()],
+      };
+      const last = cursor
+        ? await mongoose.models.Conversation.findOne({
+            ...filter,
+            _id: isValidObjectIdString(cursor) ? cursor : null,
+          })
+            .select('updatedAt')
+            .lean<{ _id: { toString(): string }; updatedAt: Date }>()
+        : null;
+      if (cursor && !last) return { chats: [], nextCursor: null };
+      const rows = await mongoose.models.Conversation.find({
+        ...filter,
+        ...(last
+          ? {
+              $or: [
+                { updatedAt: { $lt: last.updatedAt } },
+                { updatedAt: last.updatedAt, _id: { $lt: last._id } },
+              ],
+            }
+          : {}),
+      })
+        .select('conversationId title updatedAt')
+        .sort({ updatedAt: -1, _id: -1 })
+        .limit(limit + 1)
+        .lean<
+          Array<{
+            _id: { toString(): string };
+            conversationId: string;
+            title: string;
+            updatedAt: Date;
+          }>
+        >();
+      return {
+        chats: rows.slice(0, limit).map((row) => ({
+          conversationId: row.conversationId,
+          title: row.title,
+          updatedAt: row.updatedAt.toISOString(),
+        })),
+        nextCursor: rows.length > limit ? String(rows[limit - 1]._id) : null,
+      };
+    },
     async getSchoolChoice(owner: SchoolOwner, scope: string): Promise<SchoolFolderChoice> {
       const state = await states()
         .findOne({ ...ownerFilter(owner), scope })
@@ -166,32 +280,15 @@ export function createSchoolMethods(mongoose: typeof import('mongoose')): School
       const row = await findProject(owner, id);
       return row ? view(row) : null;
     },
-    async syncSchoolCourses(
-      owner: SchoolOwner,
-      scope: string,
-      courses: Array<{ id: string; name: string }>,
-    ) {
-      if (courses.length === 0) return;
+    async syncSchoolCourses(owner, scope, items) {
+      if (items.length === 0) return;
+      await migrateCourses(owner);
       await tenantSafeBulkWrite(
-        projects(),
-        courses.map((course) => ({
+        courses(),
+        items.map((course) => ({
           updateOne: {
-            filter: {
-              ...ownerFilter(owner),
-              'school.kind': 'course',
-              'school.scope': scope,
-              'school.courseId': course.id,
-            },
-            update: {
-              $set: { name: course.name.slice(0, 100) },
-              $setOnInsert: {
-                user: owner.user,
-                ...(owner.tenantId ? { tenantId: owner.tenantId } : {}),
-                school: { kind: 'course', scope, courseId: course.id },
-                conversationCount: 0,
-                contextRevision: 0,
-              },
-            },
+            filter: { ...ownerFilter(owner), scope, canvasCourseId: course.id },
+            update: { $set: { name: course.name.slice(0, 100) } },
             upsert: true,
           },
         })),
@@ -199,7 +296,7 @@ export function createSchoolMethods(mongoose: typeof import('mongoose')): School
       );
     },
     async createSchoolProject(owner: SchoolOwner, name: string, homeId?: string) {
-      if (homeId && (await findProject(owner, homeId))?.school?.kind !== 'course') return null;
+      if (homeId && !(await courses().exists(projectFilter(owner, homeId)))) return null;
       const row = await projects().create({
         ...ownerFilter(owner),
         name,
@@ -329,6 +426,11 @@ export function createSchoolMethods(mongoose: typeof import('mongoose')): School
     },
     async createSchoolChat(owner, input) {
       if (input.projectId && !(await findProject(owner, input.projectId))) return null;
+      if (
+        input.schoolCourseId &&
+        (input.projectId || !(await courses().exists(projectFilter(owner, input.schoolCourseId))))
+      )
+        return null;
       const conversationId = randomUUID();
       // Store admitted source text in visible history. Enforced model specs replace
       // prompt prefixes, so a source hidden in that field would disappear on send.
@@ -354,6 +456,7 @@ export function createSchoolMethods(mongoose: typeof import('mongoose')): School
         titleSetByUser: Boolean(input.context),
         ...(reference ? { messages: [reference._id] } : {}),
         ...(input.projectId ? { chatProjectId: input.projectId } : {}),
+        ...(input.schoolCourseId ? { schoolCourseId: input.schoolCourseId } : {}),
       });
       if (input.projectId)
         await projects().updateOne(projectFilter(owner, input.projectId), {

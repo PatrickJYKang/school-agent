@@ -19,36 +19,11 @@ export default function SchoolProject({ project }: { project: TChatProject }) {
   );
   if (!query.enabled) return null;
   const busy = refresh.isLoading || remove.isLoading;
-  if (project.school?.kind === 'course')
-    return (
-      <section
-        className="mt-3 space-y-2 text-sm"
-        aria-label={localize('com_school_course_projects')}
-      >
-        <p className="font-semibold">{localize('com_school_course_projects')}</p>
-        <ul className="space-y-1">
-          {query.data?.projects
-            .filter((p) => p.school?.homeId === project._id)
-            .map((p) => (
-              <li key={p._id}>
-                <Link className="underline" to={`/projects/${encodeURIComponent(p._id)}`}>
-                  {p.name}
-                </Link>
-              </li>
-            ))}
-        </ul>
-        <Button asChild size="sm" variant="outline">
-          <Link to={`/school/new?homeId=${encodeURIComponent(project._id)}`}>
-            {localize('com_school_work_here')}
-          </Link>
-        </Button>
-      </section>
-    );
-  const home = query.data?.projects.find((p) => p._id === project.school?.homeId);
+  const home = query.data?.courses.find((p) => p.id === project.school?.homeId);
   return (
     <section className="mt-3 space-y-2 text-sm" aria-label={localize('com_school_project_sources')}>
       {home && (
-        <Link className="underline" to={`/projects/${encodeURIComponent(home._id)}`}>
+        <Link className="underline" to={`/school/courses/${encodeURIComponent(home.id)}`}>
           {home.name}
         </Link>
       )}

@@ -2496,6 +2496,22 @@ export function createConversationMethods(
       delete unsetFields.codeEnvironmentMode;
       delete unsetFields.codeWorkspaces;
       stripActorCheckpointFields(unsetFields);
+      let schoolCourseIdOnInsert: string | undefined;
+      const courseCandidate = update.schoolCourseId;
+      delete update.schoolCourseId;
+      delete unsetFields.schoolCourseId;
+      if (
+        metadata?.noUpsert !== true &&
+        typeof courseCandidate === 'string' &&
+        isValidObjectIdString(courseCandidate)
+      ) {
+        const course = await mongoose.models.SchoolCourse.exists({
+          _id: courseCandidate,
+          user: userId,
+          tenantId: convo.tenantId ?? null,
+        });
+        if (course) schoolCourseIdOnInsert = courseCandidate;
+      }
       let chatProjectIdOnInsert: string | undefined;
       // Turn saves may seed a new conversation, never move or detach an existing one.
       const candidate = update.chatProjectId;
@@ -2644,6 +2660,9 @@ export function createConversationMethods(
           ...decisionOnInsert,
           ...retentionOnInsert,
           ...(chatProjectIdOnInsert ? { chatProjectId: chatProjectIdOnInsert } : {}),
+          ...(!chatProjectIdOnInsert && schoolCourseIdOnInsert
+            ? { schoolCourseId: schoolCourseIdOnInsert }
+            : {}),
           ...(createdAtForInsert ? { createdAt: createdAtForInsert } : {}),
         };
         return operation;
@@ -3454,6 +3473,8 @@ export function createConversationMethods(
         delete sanitized.lastResponseIsManual;
         delete sanitized.isMarkedUnread;
         delete sanitized.lastSeenAt;
+        // Imported/exported course IDs are installation-local, never authority to file a chat.
+        delete sanitized.schoolCourseId;
         delete sanitized.codeApprovalMode;
         delete sanitized.initial_agent_id;
         delete sanitized.toolApprovalAllows;
@@ -3671,6 +3692,7 @@ export function createConversationMethods(
     }
 
     if (projectId === 'unassigned') {
+      filters.push({ schoolCourseId: null });
       filters.push({
         $or: [{ chatProjectId: null }, { chatProjectId: { $exists: false } }],
       } as FilterQuery<IConversation>);
@@ -3875,7 +3897,7 @@ export function createConversationMethods(
            the sidebar lists archived and unarchived chats in the same session, and the
            active list also carries the unarchived pins beside them. */
         .select(
-          'conversationId endpoint title titleSetByUser titleRevision createdAt updatedAt archivedAt isArchived user model agent_id assistant_id spec iconURL chatProjectId pinned lastResponseAt lastResponseMessageId lastResponseIsManual isMarkedUnread lastSeenAt codeEnvironmentMode codeWorkspaces',
+          'conversationId endpoint title titleSetByUser titleRevision createdAt updatedAt archivedAt isArchived user model agent_id assistant_id spec iconURL chatProjectId schoolCourseId pinned lastResponseAt lastResponseMessageId lastResponseIsManual isMarkedUnread lastSeenAt codeEnvironmentMode codeWorkspaces',
         )
         .sort(sortObj)
         .limit(pageSize + 1)

@@ -161,3 +161,19 @@ with 250 ms added per Mongo query: LCP **4,154.1 ms** (limit 4,500), CLS **0.017
 server's 120-second startup timeout while other checks ran. The later standalone
 run passed, although one of its page audits had 10.2-second LCP; local timing is
 variable and this is a median regression gate, not a field-performance guarantee.
+
+### Dedicated Courses category
+
+The local account has Canvas course sync enabled and five synced course records.
+Courses live in their own collection and sidebar category, with direct course
+chats and optional child projects. Sync does not create native LibreChat projects
+or write to Canvas. Five verified-empty project placeholders from the earlier
+prototype were removed after preserving their metadata in an ignored local backup.
+Work-bearing legacy course projects remain accessible as child projects.
+
+A live check started a native chat in a course, sent a synthetic one-line prompt,
+received the model response and automatic title, and found the saved chat on its
+course page. It stayed outside the ordinary unfiled Chats list. The synthetic chat
+was removed afterward. No assignment content was sent to the model for this check.
+The first-send adapter preserves the school destination while LibreChat normalizes
+its new-chat URL; course labels are visible before the first message.

@@ -60,6 +60,7 @@ export default function createPayload(submission: t.TSubmission) {
     ...(compact === true && { compact: true }),
     editedContent,
     conversationId,
+    schoolCourseId: conversation.schoolCourseId,
     isContinued: !!(isEdited && isContinued),
     ephemeralAgent: s.isAssistantsEndpoint(endpoint) ? undefined : ephemeralAgent,
     manualSkills: s.isAssistantsEndpoint(endpoint) ? undefined : manualSkills,

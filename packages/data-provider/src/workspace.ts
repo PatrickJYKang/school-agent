@@ -8,6 +8,7 @@ export const schoolWorkspaceSettingsSchema = z.object({
   enabled: z.boolean().default(false),
   viewersEnabled: z.boolean().default(false),
   maxProjects: z.number().int().min(10).max(1000).default(200),
+  courseChatPageSize: z.number().int().min(1).max(100).default(30),
   maxCourses: z.number().int().min(1).max(100).default(30),
   courseConcurrency: z.number().int().min(1).max(10).default(4),
   maxAssignments: z.number().int().min(1).max(500).default(100),
@@ -44,7 +45,18 @@ export type SchoolAssignment = {
   url: string;
   dueAt?: string | null;
 };
+export type SchoolCourse = {
+  id: string;
+  name: string;
+  canvasCourseId: string;
+  active?: boolean;
+};
+export type SchoolCourseChats = {
+  chats: Array<{ conversationId: string; title: string; updatedAt: string }>;
+  nextCursor: string | null;
+};
 export type SchoolWorkspace = {
+  courses: SchoolCourse[];
   choice: SchoolFolderChoice | 'unavailable';
   projects: TChatProject[];
   truncated: boolean;

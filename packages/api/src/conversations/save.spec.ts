@@ -66,10 +66,35 @@ afterAll(async () => {
 beforeEach(async () => {
   await mongoose.models.Conversation.deleteMany({});
   await mongoose.models.Message.deleteMany({});
+  await mongoose.models.SchoolCourse.deleteMany({});
   jest.restoreAllMocks();
 });
 
 describe('seedTurnConversation', () => {
+  it('keeps the course from a native first-send request when provider options omit it', async () => {
+    const userId = new mongoose.Types.ObjectId().toString();
+    const course = await mongoose.models.SchoolCourse.create({
+      user: userId,
+      scope: 'https://school.instructure.com/1',
+      canvasCourseId: '2',
+      name: 'History',
+    });
+    const conversationId = randomUUID();
+    const req = createRequest(userId);
+    req.body = { schoolCourseId: String(course._id) };
+    await seedTurnConversation(store, seedFields(req, conversationId));
+    expect(await store.getConvo(userId, conversationId)).toMatchObject({
+      schoolCourseId: String(course._id),
+      chatProjectId: null,
+    });
+    const foreignId = new mongoose.Types.ObjectId().toString();
+    const foreignReq = createRequest(foreignId);
+    foreignReq.body = req.body;
+    const otherConversation = randomUUID();
+    await seedTurnConversation(store, seedFields(foreignReq, otherConversation));
+    expect((await store.getConvo(foreignId, otherConversation))?.schoolCourseId).toBeNull();
+  });
+
   it('creates the row a deferred first message has not written yet', async () => {
     const userId = new mongoose.Types.ObjectId().toString();
     const conversationId = randomUUID();

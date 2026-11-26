@@ -19,6 +19,7 @@ const sidebarFields = [
   'iconURL',
   'user',
   'chatProjectId',
+  'schoolCourseId',
   'pinned',
   'isArchived',
   'isShared',

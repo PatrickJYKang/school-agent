@@ -53,3 +53,19 @@ describe('createPayload', () => {
     expect(payload).not.toHaveProperty('messages');
   });
 });
+
+it('carries the conversation course destination independently of provider parameters', () => {
+  const submission = {
+    conversation: {
+      conversationId: 'new',
+      schoolCourseId: 'course-id',
+      endpoint: EModelEndpoint.openAI,
+      title: 'New Chat',
+      createdAt: '',
+      updatedAt: '',
+    },
+    endpointOption: { endpoint: EModelEndpoint.openAI },
+    userMessage: { text: 'Question' },
+  } as TSubmission;
+  expect(createPayload(submission).payload.schoolCourseId).toBe('course-id');
+});

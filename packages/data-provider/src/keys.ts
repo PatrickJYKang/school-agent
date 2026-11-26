@@ -1,6 +1,8 @@
 export enum QueryKeys {
   school = 'school',
   schoolWorkspace = 'schoolWorkspace',
+  schoolCourseChats = 'schoolCourseChats',
+  schoolCourse = 'schoolCourse',
   schoolViewers = 'schoolViewers',
   schoolLiveView = 'schoolLiveView',
   schoolBrowser = 'schoolBrowser',

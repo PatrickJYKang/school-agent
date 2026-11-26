@@ -13,6 +13,7 @@ import { OAuthSuccess, OAuthError } from '~/components/OAuth';
 import SchoolDashboard from '~/components/School/Dashboard';
 import { AuthContextProvider } from '~/hooks/AuthContext';
 import { importWithRecovery } from '~/lib/assets/lazy';
+import SchoolCourse from '~/components/School/Course';
 import SchoolLiveView from '~/components/School/Live';
 import RouteErrorBoundary from './RouteErrorBoundary';
 import SchoolEntry from '~/components/School/Entry';
@@ -149,6 +150,10 @@ export const router = createBrowserRouter(
                 {
                   path: 'school',
                   element: <SchoolDashboard />,
+                },
+                {
+                  path: 'school/courses/:courseId',
+                  element: <SchoolCourse />,
                 },
                 {
                   path: 'school/new',

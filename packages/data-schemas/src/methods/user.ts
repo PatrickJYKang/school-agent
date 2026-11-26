@@ -631,6 +631,7 @@ export function createUserMethods(
       const User = mongoose.models.User;
       await mongoose.models.ToolApprovalGrant?.deleteMany({ user: userId });
       await mongoose.models.SchoolState?.deleteMany({ user: userId });
+      await mongoose.models.SchoolCourse?.deleteMany({ user: userId });
       await mongoose.models.Conversation?.updateMany(
         { schoolViewers: userId },
         { $pull: { schoolViewers: userId } },

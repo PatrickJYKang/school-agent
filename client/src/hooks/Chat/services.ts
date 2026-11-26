@@ -1,3 +1,4 @@
+import { useContext } from 'react';
 import { useStore } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { QueryKeys } from 'librechat-data-provider';
@@ -18,12 +19,14 @@ import {
 import { activeUsageResponseIdFamily } from '~/components/Chat/Input/TokenUsage/store';
 import useFocusRegeneratedResponse from '~/hooks/Chat/useFocusRegeneratedResponse';
 import useGetConversation from '~/hooks/Conversations/useGetConversation';
+import { SchoolNavigationContext } from '~/components/School/context';
 import useCodeApprovalMode from '~/hooks/Agents/useCodeApprovalMode';
 import useSetFilesToDelete from '~/hooks/Files/useSetFilesToDelete';
 import { useAgentsMapContext } from '~/Providers/AgentsMapContext';
 import { useChatSettings } from '~/Providers/ChatSettingsContext';
 import useCodeWorkspace from '~/hooks/Agents/useCodeWorkspace';
 import useGetSender from '~/hooks/Conversations/useGetSender';
+import { schoolChatPath } from '~/components/School/routing';
 import { resolveSubmittedReasoning } from './ask/reasoning';
 import { isHistoryRevalidating } from './ask/guards';
 import useUserKey from '~/hooks/Input/useUserKey';
@@ -36,6 +39,7 @@ export default function useTurnServices({
 }: Pick<ChatTurnsParams, 'index' | 'conversation'>): TurnServices {
   const store = useStore();
   const navigate = useNavigate();
+  const school = useContext(SchoolNavigationContext);
   const getSender = useGetSender();
   const queryClient = useQueryClient();
   const setFilesToDelete = useSetFilesToDelete();
@@ -103,7 +107,7 @@ export default function useTurnServices({
     },
     openNewChat: (path) => {
       requestChatFocus();
-      navigate(path);
+      navigate(schoolChatPath(path, window.location.search, school != null));
     },
     releaseFiles: (fileIds) => markPasteSubmitted(...fileIds),
     clearFilesToDelete: () => setFilesToDelete({}),

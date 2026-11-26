@@ -43,7 +43,7 @@ restriction on every student conversation.
    tools. Use synthetic or explicitly admitted materials during development.
 2. **Build the dashboard and complete the assignment help experience.** Reuse the
    existing Canvas tools and native personal projects. Show upcoming assignments
-   with separate Open in Canvas, Start chat and Add to project actions. Keep a
+   with separate Open in Canvas, Start chat and Add to existing project actions. Keep a
    course-folder permission prompt visible until Allow/Don't allow is chosen and
    remember the decision. The generic New chat action opens the destination
    picker. All assignments added to a project supply common context across its

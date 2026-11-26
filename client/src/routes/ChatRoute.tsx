@@ -38,6 +38,7 @@ import {
   useLocalize,
 } from '~/hooks';
 import { ToolCallsMapProvider, useAgentsMapContext } from '~/Providers';
+import { useSchoolCourse } from '~/components/School/queries';
 import ChatView from '~/components/Chat/ChatView';
 import { NotificationSeverity } from '~/common';
 import useAuthRedirect from './useAuthRedirect';
@@ -64,6 +65,10 @@ export default function ChatRoute() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { conversationId = '' } = useParams();
   const projectIdParam = searchParams.get('projectId');
+  const courseIdParam = projectIdParam ? null : searchParams.get('courseId');
+  const course = useSchoolCourse(!projectIdParam ? courseIdParam : null);
+  const schoolCourseId =
+    !course.isError && course.data?.id === courseIdParam ? courseIdParam : null;
   const chatProjectId = isValidChatProjectId(projectIdParam) ? projectIdParam : null;
   useIdChangeEffect(conversationId);
   const { hasSetConversation, conversation } = store.useCreateConversationAtom(index);
@@ -105,8 +110,11 @@ export default function ChatRoute() {
   const verifiedChatProjectId =
     !projectNotFound && projectQuery.data?._id === chatProjectId ? chatProjectId : null;
   const projectTemplate = useMemo(
-    () => (verifiedChatProjectId ? { chatProjectId: verifiedChatProjectId } : {}),
-    [verifiedChatProjectId],
+    () =>
+      verifiedChatProjectId
+        ? { chatProjectId: verifiedChatProjectId, schoolCourseId: null }
+        : { chatProjectId: null, schoolCourseId },
+    [verifiedChatProjectId, schoolCourseId],
   );
 
   /**
@@ -177,9 +185,11 @@ export default function ChatRoute() {
     const rolesLoaded = roles?.USER != null;
     const isNewConvo = conversationId === Constants.NEW_CONVO;
     const isDraftNewConvo = conversation?.conversationId === Constants.NEW_CONVO;
-    const draftProjectMismatch = verifiedChatProjectId
-      ? conversation?.chatProjectId !== verifiedChatProjectId
-      : conversation?.chatProjectId != null;
+    const draftProjectMismatch =
+      (verifiedChatProjectId
+        ? conversation?.chatProjectId !== verifiedChatProjectId
+        : conversation?.chatProjectId != null) ||
+      (conversation?.schoolCourseId ?? null) !== schoolCourseId;
     const newConvoNeedsInit =
       isNewConvo && (!conversation || (isDraftNewConvo && draftProjectMismatch));
     const shouldSetConvo =
@@ -193,13 +203,24 @@ export default function ChatRoute() {
       return;
     }
 
-    if (isNewConvo && chatProjectId && projectQuery.isLoading) {
+    if (isNewConvo && courseIdParam && course.isError) return;
+    if (
+      isNewConvo &&
+      ((chatProjectId && projectQuery.isLoading) ||
+        (courseIdParam && course.isLoading && course.fetchStatus !== 'idle'))
+    ) {
       return;
     }
 
     const queryParams: Record<string, string> = {};
     searchParams.forEach((value, key) => {
-      if (key !== 'prompt' && key !== 'q' && key !== 'submit' && key !== 'projectId') {
+      if (
+        key !== 'prompt' &&
+        key !== 'q' &&
+        key !== 'submit' &&
+        key !== 'projectId' &&
+        key !== 'courseId'
+      ) {
         queryParams[key] = value;
       }
     });
@@ -338,6 +359,12 @@ export default function ChatRoute() {
     projectTemplate,
     queryClient,
     conversation?.chatProjectId,
+    conversation?.schoolCourseId,
+    schoolCourseId,
+    courseIdParam,
+    course.isError,
+    course.isLoading,
+    course.fetchStatus,
     conversation?.conversationId,
   ]);
 
@@ -366,6 +393,15 @@ export default function ChatRoute() {
     return null;
   }
 
+  if (courseIdParam && course.isError && conversationId === Constants.NEW_CONVO)
+    return (
+      <div className="flex h-screen flex-col items-center justify-center gap-3" role="alert">
+        <p>{localize('com_school_workspace_error')}</p>
+        <Button onClick={() => void course.refetch()}>
+          {localize('com_school_workspace_retry')}
+        </Button>
+      </div>
+    );
   return (
     <ToolCallsMapProvider conversationId={conversation.conversationId ?? ''}>
       {routeState.pending && (
