@@ -7,9 +7,12 @@ assignment experience, visible assistance guidance, inspectable evidence and
 student control. The [dashboard specification](dashboard.md) now calls for
 upcoming assignments, remembered course-folder permission, a New chat destination
 picker, common assignment context across project chats and named live viewers.
-Those school-specific flows and model choice are planned work, separate from the
-working capabilities below. Native personal projects already supply chat grouping,
-instructions and reference files.
+The dashboard, remembered folder choice, destination picker, project assignment
+context and named text-only live viewers now have a first implementation. See the
+[implementation status and limits](dashboard.md#implementation-status). Model
+choice evaluation, shared attachment access and a reviewed AI-use summary remain
+future work. These additions reuse native personal projects, instructions,
+reference files and visual components.
 
 The application keeps LibreChat's standard layout, logo, theme, model menu, dialogs,
 file attachments, exports, agents, and permissions. The HTML concept is a reference;

@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { dataService, QueryKeys } from 'librechat-data-provider';
 
-export function useSchoolQuery() {
+export function useSchoolQuery(enabled = true) {
   return useQuery([QueryKeys.school], dataService.getSchoolStatus, {
+    enabled,
     staleTime: 60_000,
     retry: false,
   });

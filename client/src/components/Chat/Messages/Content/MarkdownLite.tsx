@@ -28,7 +28,15 @@ import MarkdownErrorBoundary from './MarkdownErrorBoundary';
 import { langSubset, remarkApproxTilde } from '~/utils';
 
 const MarkdownLite = memo(
-  ({ content = '', codeExecution = true }: { content?: string; codeExecution?: boolean }) => {
+  ({
+    content = '',
+    codeExecution = true,
+    images = true,
+  }: {
+    content?: string;
+    codeExecution?: boolean;
+    images?: boolean;
+  }) => {
     const rehypePlugins: PluggableList = [
       [rehypeKatex],
       [
@@ -60,7 +68,7 @@ const MarkdownLite = memo(
                   code: codeExecution ? code : codeNoExecution,
                   a,
                   p,
-                  img,
+                  img: images ? img : () => null,
                   table,
                   ul,
                   ol,

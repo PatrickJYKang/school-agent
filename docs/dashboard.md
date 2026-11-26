@@ -7,8 +7,74 @@ assignment context. Collaborators can read an explicitly shared chat as it
 changes, while the owner retains control of the conversation and assistant.
 
 This is the next user-experience specification under [scope.md](scope.md).
-The dashboard, Canvas folder associations and live viewer mode are planned work,
-not implemented capabilities of the current prototype.
+The first implementation was added November 25, 2026. Enable it with
+`interface.school.workspace.enabled` in `librechat.yaml` (enabled in the local
+configuration, off by default). The following sections retain the broader UX
+specification; the implementation and remaining limits are recorded below.
+
+## Implementation status
+
+Live viewers also require `workspace.viewersEnabled: true` (off by default,
+enabled locally). Creating grants uses LibreChat's existing shared-link creation
+permission; an institution disabling sharing blocks live reads too. Viewer text
+passes the existing sharing content checks. New assignment chats and their copied
+reference messages receive the effective chat-retention deadline.
+
+- `/school` is the school landing page. Upcoming assignments have separate Canvas,
+  chat and project actions. Dates use the configured school timezone. Empty,
+  disconnected, partial, bounded and failed reads have distinct states.
+- Allow/Don't allow is stored per user, tenant and verified Canvas account/site.
+  Until answered the prompt remains visible. Change it on the dashboard. Course
+  sync creates or renames personal native project records marked as course roots;
+  it never deletes work or creates a project/chat per assignment. A Canvas outage
+  leaves ordinary project work available and does not reset consent.
+- `/school/new` is the generic destination picker, including course roots,
+  existing projects, new projects in a course, and unfiled work. Explicit project
+  chat actions retain their known destination. Ordinary chats use the native
+  composer and are saved/named after the first message; assignment chats keep
+  their assignment title and begin with a visible Canvas reference message.
+  This preserves the context when a school helper enforces its own instructions.
+  Opening the picker alone creates no chat.
+- Adding an assignment imports bounded Markdown through the existing Canvas
+  reader and content checks. Sources from several courses can coexist in a
+  project. Import, refresh and removal change its context revision. Every
+  subsequent project turn resolves the current source material; previous replies
+  and independent chat transcripts are preserved. Inspect copied text and refresh
+  or remove it in the project's instructions/context panel. Older project records
+  without a stored revision can also admit context. Source imports use the native
+  document and message/import checks; subsequent project turns recheck the current
+  file and message rules. Protected reference text is refused, including under a
+  redaction rule, rather than copied as unprotected plain text.
+- **Chat viewers** in the composer grants a named, existing account in the same
+  institution access to an authenticated `/school/view/:conversationId` link.
+  Send the link yourself. It polls the latest saved branch, checks the grant on
+  each read, and hides cached content when access fails. Owners alone retain all
+  message, tool, project-context and connection actions. Existing snapshot links
+  keep their original behavior.
+
+The first viewer is **text only**: files, image previews, tool payloads, private
+reasoning and raw project context are excluded. Visible messages can contain copied or quoted sources,
+so granting access still discloses the visible conversation. Explicit attachment
+admission/download permissions remain unfinished. Viewer discovery/invitations,
+mail notifications and simultaneous multi-person chat are not implemented.
+
+Course/project hierarchy is shown on the dashboard and inside a course. Native
+LibreChat's general project list remains flat. The dashboard imports the bounded
+assignment list supported by the current Canvas connector; completeness of
+individual differentiated due dates still needs evaluation against real courses.
+No submission/grade state is inferred. Project assignment imports do not crawl
+linked documents automatically; document tools and native project file admission
+remain separate. Long material that exceeds context limits is refused with an
+explanation rather than silently dropped.
+
+Dashboard reads are shared through React Query and refresh every five minutes by
+default while a workspace screen is mounted; the Refresh button requests an
+immediate read. This is client caching, not a deployment-wide Canvas cache.
+`workspace` settings bound courses, request concurrency, assignments, projects,
+source/context size, viewers, update frequency and viewer text/message size.
+Large deployments still need Canvas load testing and a production sharing audit.
+Existing personal projects remain compatible, and feature-off deployments retain
+their normal chat landing page.
 
 ## Home dashboard
 

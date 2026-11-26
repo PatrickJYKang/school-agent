@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { schoolWorkspaceSettingsSchema } from './workspace';
 import { schoolBrowserSettingsSchema } from './browser';
 
 const documentSettingsSchema = z.object({
@@ -53,6 +54,7 @@ const schoolSettingsSchema = z.object({
   externalLinks: externalLinksSchema.default(() => externalLinksSchema.parse({})),
   webSearch: schoolSearchSchema.default(() => schoolSearchSchema.parse({})),
   browser: schoolBrowserSettingsSchema.default(() => schoolBrowserSettingsSchema.parse({})),
+  workspace: schoolWorkspaceSettingsSchema.default(() => schoolWorkspaceSettingsSchema.parse({})),
   canvas: z
     .object({
       enabled: z.boolean().default(false),
@@ -98,6 +100,7 @@ export const schoolSchema = schoolSettingsSchema.partial().extend({
   externalLinks: externalLinksSchema.partial().optional(),
   webSearch: schoolSearchSchema.partial().optional(),
   browser: schoolBrowserSettingsSchema.partial().optional(),
+  workspace: schoolWorkspaceSettingsSchema.partial().optional(),
   canvas: schoolSettingsSchema.shape.canvas.unwrap().partial().optional(),
 });
 export type SchoolConfig = z.infer<typeof schoolSettingsSchema>;
@@ -111,6 +114,7 @@ export type SchoolStatus = {
   name: string;
   guidance: string;
   browser?: { enabled: boolean };
+  workspace?: { enabled: boolean; viewersEnabled: boolean };
   canvas: { enabled: boolean; baseUrl?: string; connected: boolean; toolCalling: boolean };
 };
 export type CanvasCourse = { id: string; name: string; code: string };

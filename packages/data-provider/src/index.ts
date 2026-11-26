@@ -1,5 +1,6 @@
 /* config */
 export * from './school';
+export * from './workspace';
 export * from './azure';
 export * from './bedrock';
 export * from './balance';

@@ -16,6 +16,7 @@ import type {
 } from './school';
 import type { TInsightsAccessResponse, TInsightsParams, TInsightsResponse } from './types/insights';
 import type { ScheduleMCPConsentView, ConfirmScheduleMCPConsent } from './types/scheduleConsent';
+import type { SchoolWorkspace, SchoolViewer, SchoolLiveView } from './workspace';
 import type { CodeSetupAttempt, CodeSetupApprovalRequest } from './codeSetup';
 import type { SchoolBrowserState } from './browser';
 import type { TFileConfig } from './file-config';
@@ -40,6 +41,59 @@ import * as config from './config';
 import request from './request';
 
 export const getSchoolStatus = (): Promise<SchoolStatus> => request.get(endpoints.school());
+export const getSchoolWorkspace = (): Promise<SchoolWorkspace> =>
+  request.get(endpoints.school('/workspace'));
+export const setSchoolFolderChoice = (choice: 'allowed' | 'denied'): Promise<{ choice: string }> =>
+  request.put(endpoints.school('/workspace/choice'), { choice });
+export const createSchoolProject = (input: {
+  name: string;
+  homeId?: string;
+}): Promise<t.TChatProject> => request.post(endpoints.school('/workspace/projects'), input);
+export const addSchoolProjectSource = (input: {
+  projectId: string;
+  courseId: string;
+  id: string;
+}): Promise<t.TChatProject> =>
+  request.post(
+    endpoints.school(`/workspace/projects/${encodeURIComponent(input.projectId)}/sources`),
+    { courseId: input.courseId, id: input.id },
+  );
+export const removeSchoolProjectSource = (input: {
+  projectId: string;
+  courseId: string;
+  id: string;
+}): Promise<t.TChatProject> =>
+  request.delete(
+    endpoints.school(
+      `/workspace/projects/${encodeURIComponent(input.projectId)}/sources/${encodeURIComponent(input.courseId)}/${encodeURIComponent(input.id)}`,
+    ),
+  );
+export const createSchoolChat = (input: {
+  projectId?: string;
+  assignment?: { courseId: string; id: string };
+}): Promise<{ conversationId: string }> =>
+  request.post(endpoints.school('/workspace/chats'), input);
+export const getSchoolViewers = (id: string): Promise<SchoolViewer[]> =>
+  request.get(endpoints.school(`/workspace/chats/${encodeURIComponent(id)}/viewers`));
+export const addSchoolViewer = (input: {
+  conversationId: string;
+  email: string;
+}): Promise<{ ok: boolean }> =>
+  request.post(
+    endpoints.school(`/workspace/chats/${encodeURIComponent(input.conversationId)}/viewers`),
+    { email: input.email },
+  );
+export const removeSchoolViewer = (input: {
+  conversationId: string;
+  viewer: string;
+}): Promise<void> =>
+  request.delete(
+    endpoints.school(
+      `/workspace/chats/${encodeURIComponent(input.conversationId)}/viewers/${encodeURIComponent(input.viewer)}`,
+    ),
+  );
+export const getSchoolLiveView = (id: string): Promise<SchoolLiveView> =>
+  request.get(endpoints.school(`/workspace/view/${encodeURIComponent(id)}`));
 export const getSchoolBrowser = (conversationId: string): Promise<SchoolBrowserState> =>
   request.get(endpoints.school(`/browser/${encodeURIComponent(conversationId)}`));
 export const stopSchoolBrowser = (conversationId: string): Promise<SchoolBrowserState> =>

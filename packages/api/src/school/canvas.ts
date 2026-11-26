@@ -179,7 +179,7 @@ export function canvasLinkedUrls(html: string, origin: string): { title: string;
 }
 
 export interface CanvasClient {
-  verify(): Promise<void>;
+  verify(): Promise<string>;
   courses(): Promise<CanvasList<CanvasCourse>>;
   materials(course: string, kind: 'assignment' | 'page'): Promise<CanvasList<CanvasMaterial>>;
   context(selections: CanvasSelection[]): Promise<CanvasContext>;
@@ -292,7 +292,7 @@ export function createCanvasClient({
   });
   return {
     async verify() {
-      await read(new URL('/api/v1/users/self/profile', origin), profileSchema);
+      return (await read(new URL('/api/v1/users/self/profile', origin), profileSchema)).value.id;
     },
     async courses(): Promise<CanvasList<CanvasCourse>> {
       const result = await list('courses?enrollment_state=active', courseSchema);

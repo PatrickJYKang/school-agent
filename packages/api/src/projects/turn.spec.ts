@@ -26,6 +26,40 @@ const project = {
 const getProjectFiles = jest.fn().mockResolvedValue([]);
 const logger = { warn: jest.fn(), error: jest.fn() };
 
+it('rechecks copied assignment material against current message and file policies on later turns', () => {
+  const context = {
+    projectId: 'project-a',
+    contextRevision: 1,
+    instructions: 'Reference material',
+    file_ids: [],
+    resources: [],
+    schoolSources: [
+      {
+        courseId: '1',
+        id: '2',
+        title: 'Essay',
+        url: 'https://school.instructure.com',
+        retrievedAt: '2026-11-25',
+        markdown: 'SECRET-123',
+      },
+    ],
+  };
+  expect(() =>
+    assertChatProjectInstructions({
+      context,
+      filters: {
+        messages: { pii: { action: 'redact', starterPatterns: [], customPatterns: [pattern] } },
+      },
+    }),
+  ).toThrow();
+  expect(() =>
+    assertChatProjectInstructions({
+      context,
+      filters: { files: { pii: { starterPatterns: [], customPatterns: [pattern] } } },
+    }),
+  ).toThrow();
+});
+
 describe('getChatProjectTurnFailure', () => {
   it('maps changed project resources to a retryable conflict', () => {
     expect(getChatProjectTurnFailure(new ChatProjectResourcesChangedError())).toEqual({

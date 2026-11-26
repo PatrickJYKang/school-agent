@@ -32,7 +32,7 @@ const NewChatButton = memo(function NewChatButton({
     }
   }, [switchToHistory, setActive]);
 
-  const { handleNewChatClick } = useNewChat({ onNewChat: handlePanelSwitch });
+  const { handleNewChatClick, newChatHref } = useNewChat({ onNewChat: handlePanelSwitch });
 
   return (
     <TooltipAnchor
@@ -40,7 +40,7 @@ const NewChatButton = memo(function NewChatButton({
       description={tooltipDescription}
       render={
         <a
-          href="/c/new"
+          href={newChatHref ?? '/c/new'}
           data-testid="new-chat-button"
           aria-label={localize('com_ui_new_chat')}
           aria-keyshortcuts={ariaKey}

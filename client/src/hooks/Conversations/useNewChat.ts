@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { useRecoilValue } from 'recoil';
 import { filesFamily } from '@librechat/chat/react';
@@ -36,6 +36,7 @@ import {
   takeRetainedFileDeletions,
 } from '~/utils';
 import { useGetFiles, useGetFileConfig, useDeleteFilesMutation } from '~/data-provider';
+import { SchoolNavigationContext } from '~/components/School/context';
 import { useChatSettings } from '~/Providers/ChatSettingsContext';
 import useNewConvo from '~/hooks/useNewConvo';
 import store from '~/store';
@@ -52,6 +53,7 @@ export type UseNewChatParams = {
 
 export type UseNewChatResult = {
   startNewChat: () => void;
+  newChatHref: string;
   /** For an `<a href="/c/new">` trigger, so modified clicks still open a tab. */
   handleNewChatClick: (event: MouseEvent<HTMLElement>) => void;
   newConversation: ReturnType<typeof useNewConvo>['newConversation'];
@@ -121,6 +123,7 @@ export default function useNewChat({
   onNewChat,
 }: UseNewChatParams = {}): UseNewChatResult {
   const queryClient = useQueryClient();
+  const schoolNavigation = useContext(SchoolNavigationContext);
   const { newConversation } = useNewConvo(index);
   const conversationId = useRecoilValue(store.conversationIdByIndex(index));
   const files = useAtomValue(filesFamily(index));
@@ -295,6 +298,11 @@ export default function useNewChat({
   ]);
 
   const startNewChat = useCallback(() => {
+    if (schoolNavigation) {
+      schoolNavigation.openNewChat();
+      onNewChat?.();
+      return;
+    }
     clearMessagesCache(queryClient, conversationId);
     queryClient.invalidateQueries([QueryKeys.messages]);
     /** The unsaved-chat draft key outlives the reset and `useAutoSave` restores from it on the way
@@ -462,6 +470,7 @@ export default function useNewChat({
     newConversation();
     onNewChat?.();
   }, [
+    schoolNavigation,
     queryClient,
     conversationId,
     newConversation,
@@ -485,5 +494,10 @@ export default function useNewChat({
     [startNewChat],
   );
 
-  return { startNewChat, handleNewChatClick, newConversation };
+  return {
+    startNewChat,
+    handleNewChatClick,
+    newConversation,
+    newChatHref: schoolNavigation?.href ?? '/c/new',
+  };
 }

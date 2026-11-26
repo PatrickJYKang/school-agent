@@ -24,6 +24,7 @@ import type {
 import type { BalanceRefillMode, RefillIntervalUnit } from './balance';
 import type { StatefulCodeEnvironment } from './stateful-code';
 import type { CodeApprovalMode } from './code/approval';
+import type { SchoolProjectData } from './workspace';
 import type { EToolResources } from './types/tools';
 import type { SettingDefinition } from './generate';
 import type { TMinimalFeedback } from './feedback';
@@ -399,6 +400,7 @@ export type TUpdateConversationRequest = {
 export type TUpdateConversationResponse = TConversation;
 
 export type TChatProject = {
+  school?: SchoolProjectData;
   _id: string;
   name: string;
   description?: string;

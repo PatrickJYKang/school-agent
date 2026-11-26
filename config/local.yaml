@@ -16,6 +16,9 @@ interface:
       safeSearch: strict
     browser:
       enabled: true
+    workspace:
+      enabled: true
+      viewersEnabled: true
     guidance: >-
       Use AI to understand, question, and improve your work. Check source material
       and follow the AI-use instructions in your assignment. Explain your own

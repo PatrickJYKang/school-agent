@@ -29,6 +29,7 @@ import { useSchoolQuery, useCanvasCourses, useCanvasMaterials } from '~/data-pro
 import { useFileHandlingNoChatContext } from '~/hooks/Files';
 import { useLocalize } from '~/hooks';
 import SchoolBrowser from './Browser';
+import SchoolViewers from './Viewers';
 
 const errorKey = (error: unknown): `com_school_${CanvasErrorCode}` => {
   const code = (error as { response?: { data?: { code?: string } } })?.response?.data?.code;
@@ -81,6 +82,8 @@ export default function SchoolCanvas({
       setError(null);
       void cache.invalidateQueries([QueryKeys.school]);
       void cache.invalidateQueries([QueryKeys.canvasCourses]);
+      cache.removeQueries([QueryKeys.canvasMaterials]);
+      cache.removeQueries([QueryKeys.schoolWorkspace]);
     },
     onError: setError,
   });
@@ -92,6 +95,7 @@ export default function SchoolCanvas({
       setPreview(null);
       cache.removeQueries([QueryKeys.canvasCourses]);
       cache.removeQueries([QueryKeys.canvasMaterials]);
+      cache.removeQueries([QueryKeys.schoolWorkspace]);
       void cache.invalidateQueries([QueryKeys.school]);
     },
     onError: setError,
@@ -146,6 +150,7 @@ export default function SchoolCanvas({
     <>
       <div className="flex flex-wrap items-center gap-1 px-3 pt-2">
         <SchoolBrowser index={index} conversationId={conversation?.conversationId} />
+        <SchoolViewers conversationId={conversation?.conversationId} />
         {school.canvas.enabled && (
           <Button
             type="button"

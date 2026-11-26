@@ -11,7 +11,7 @@ import { cn } from '~/utils';
  */
 export default function NewChat({ className }: { className?: string }) {
   const localize = useLocalize();
-  const { handleNewChatClick } = useNewChat();
+  const { handleNewChatClick, newChatHref } = useNewChat();
   const tooltipDescription = useShortcutHint('newChat', localize('com_ui_new_chat'));
   const ariaKey = useShortcutAriaKey('newChat');
 
@@ -26,7 +26,7 @@ export default function NewChat({ className }: { className?: string }) {
           className={cn('size-9 shrink-0', className)}
         >
           <a
-            href="/c/new"
+            href={newChatHref ?? '/c/new'}
             data-testid="header-new-chat-button"
             aria-label={localize('com_ui_new_chat')}
             aria-keyshortcuts={ariaKey}

@@ -7,6 +7,29 @@ import type { IChatProjectDocument } from '~/types';
 
 const chatProjectSchema: Schema<IChatProjectDocument> = new Schema<IChatProjectDocument>(
   {
+    school: {
+      type: new Schema(
+        {
+          kind: { type: String, enum: ['course', 'project'], required: true },
+          scope: String,
+          courseId: String,
+          homeId: { type: String, default: null },
+          sources: [
+            {
+              _id: false,
+              courseId: String,
+              id: String,
+              title: String,
+              url: String,
+              markdown: String,
+              retrievedAt: String,
+            },
+          ],
+        },
+        { _id: false },
+      ),
+      default: undefined,
+    },
     name: {
       type: String,
       required: true,
@@ -62,6 +85,10 @@ const chatProjectSchema: Schema<IChatProjectDocument> = new Schema<IChatProjectD
 );
 
 chatProjectSchema.index({ user: 1, name: 1, _id: 1 });
+chatProjectSchema.index(
+  { user: 1, tenantId: 1, 'school.scope': 1, 'school.courseId': 1 },
+  { unique: true, partialFilterExpression: { 'school.kind': 'course' } },
+);
 chatProjectSchema.index({ user: 1, createdAt: -1, _id: -1 });
 chatProjectSchema.index({ user: 1, lastConversationAt: -1, _id: -1 });
 

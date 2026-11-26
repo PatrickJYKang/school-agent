@@ -8,10 +8,14 @@ import {
   TwoFactorSetupScreen,
   RequestPasswordReset,
 } from '~/components/Auth';
+import SchoolDestination from '~/components/School/Destination';
 import { OAuthSuccess, OAuthError } from '~/components/OAuth';
+import SchoolDashboard from '~/components/School/Dashboard';
 import { AuthContextProvider } from '~/hooks/AuthContext';
 import { importWithRecovery } from '~/lib/assets/lazy';
+import SchoolLiveView from '~/components/School/Live';
 import RouteErrorBoundary from './RouteErrorBoundary';
+import SchoolEntry from '~/components/School/Entry';
 import StartupLayout from './Layouts/Startup';
 import MarketplaceRoute from './Marketplace';
 import { codeSetupRoute } from './CodeSetup';
@@ -19,7 +23,6 @@ import LoginLayout from './Layouts/Login';
 import dashboardRoutes from './Dashboard';
 import WithRum from '~/lib/rum/WithRum';
 import ShareRoute from './ShareRoute';
-import ChatRoute from './ChatRoute';
 import Search from './Search';
 import Root from './Root';
 
@@ -137,11 +140,23 @@ export const router = createBrowserRouter(
               children: [
                 {
                   index: true,
-                  element: <Navigate to="/c/new" replace={true} />,
+                  element: <SchoolEntry landing />,
                 },
                 {
                   path: 'c/:conversationId?',
-                  element: <ChatRoute />,
+                  element: <SchoolEntry />,
+                },
+                {
+                  path: 'school',
+                  element: <SchoolDashboard />,
+                },
+                {
+                  path: 'school/new',
+                  element: <SchoolDestination />,
+                },
+                {
+                  path: 'school/view/:conversationId',
+                  element: <SchoolLiveView />,
                 },
                 {
                   path: 'search',

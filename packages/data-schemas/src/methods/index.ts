@@ -120,6 +120,7 @@ import {
   type ParentSubagentThreadRecord,
 } from './conversation';
 import { createChatProjectMethods, type ChatProjectMethods } from './chatProject';
+import { createSchoolMethods, type SchoolMethods } from './school';
 export type {
   AssignConversationToProjectResult,
   ChatProjectSortBy,
@@ -312,6 +313,7 @@ export type AllMethods = SubagentContentMethods &
   MessageMethods &
   ConversationMethods &
   ChatProjectMethods &
+  SchoolMethods &
   TxMethods &
   TransactionMethods &
   SpendTokensMethods &
@@ -561,6 +563,7 @@ export function createMethods(
     ...messageMethods,
     ...conversationMethods,
     ...createChatProjectMethods(mongoose),
+    ...createSchoolMethods(mongoose),
     /* Tier 3 */
     ...txMethods,
     ...transactionMethods,

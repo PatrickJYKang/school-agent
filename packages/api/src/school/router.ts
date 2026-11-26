@@ -4,55 +4,28 @@ import { logger } from '@librechat/data-schemas';
 import { canvasContextRequestSchema, resolveSchoolConfig } from 'librechat-data-provider';
 import type { SchoolConfig, SchoolStatus } from 'librechat-data-provider';
 import type { Request, Response, RequestHandler, Router } from 'express';
-import type { SchoolBrowserSettings } from 'librechat-data-provider';
-import type { AppConfig } from '@librechat/data-schemas';
-import type { BrowserTransport } from './browser/client';
-import type { GetAppConfigOptions } from '~/app/service';
+import type { SchoolDependencies } from './types';
 import type { ServerRequest } from '~/types';
-import type { CanvasFetch } from './canvas';
 import {
   canvasPluginKey as pluginKey,
   canvasAuthField as authField,
   readCanvasConnection,
 } from './connection';
+import { createSchoolWorkspaceRouter, schoolViewersEnabled } from './workspace';
 import { CanvasError, canvasOrigin, createCanvasClient } from './canvas';
 import { getAppConfigOptionsFromUser } from '~/app/service';
 import { schoolBrowserEnabled } from './browser/tool';
 
-export type SchoolDependencies = {
-  createBrowserClient?: (input: {
-    user: { id: string; tenantId?: string };
-    conversationId: string;
-    settings: SchoolBrowserSettings;
-  }) => BrowserTransport;
-  getAppConfig: (options: GetAppConfigOptions) => Promise<AppConfig>;
-  requireJwtAuth: RequestHandler;
-  fetchFn: CanvasFetch;
-  encrypt: (value: string, format?: 'v3' | 'legacy') => Promise<string>;
-  decrypt: (value: string) => Promise<string>;
-  store: {
-    findOnePluginAuth: (input: {
-      userId: string;
-      authField: string;
-      pluginKey: string;
-    }) => Promise<{ value: string } | null>;
-    updatePluginAuth: (input: {
-      userId: string;
-      authField: string;
-      pluginKey: string;
-      value: string;
-    }) => Promise<{ value: string }>;
-    deletePluginAuth: (input: {
-      userId: string;
-      pluginKey: string;
-      all: boolean;
-    }) => Promise<{ deletedCount?: number }>;
-  };
-};
+export type { SchoolDependencies } from './types';
 
 export function createSchoolRouter(deps: SchoolDependencies): Router {
   const router = express.Router();
   router.use(deps.requireJwtAuth);
+  if (deps.workspaceStore)
+    router.use(
+      '/workspace',
+      createSchoolWorkspaceRouter({ ...deps, workspaceStore: deps.workspaceStore }),
+    );
   async function access(req: Request) {
     const user = (req as ServerRequest).user;
     if (!user?.id) throw new CanvasError('canvas_unauthorized', 401);
@@ -113,6 +86,10 @@ export function createSchoolRouter(deps: SchoolDependencies): Router {
       name: school.name,
       guidance: school.guidance,
       browser: { enabled: schoolBrowserEnabled(school, config) },
+      workspace: {
+        enabled: school.workspace.enabled,
+        viewersEnabled: schoolViewersEnabled(school, config, Boolean(deps.requireSharingAccess)),
+      },
       canvas: {
         enabled: school.canvas.enabled,
         toolCalling: school.canvas.toolCalling,

@@ -630,6 +630,11 @@ export function createUserMethods(
     try {
       const User = mongoose.models.User;
       await mongoose.models.ToolApprovalGrant?.deleteMany({ user: userId });
+      await mongoose.models.SchoolState?.deleteMany({ user: userId });
+      await mongoose.models.Conversation?.updateMany(
+        { schoolViewers: userId },
+        { $pull: { schoolViewers: userId } },
+      );
       const result = await User.deleteOne({ _id: userId });
       if (result.deletedCount === 0) {
         return { deletedCount: 0, message: 'No user found with that ID.' };

@@ -1,9 +1,11 @@
+import { createElement } from 'react';
 import { getDefaultStore } from 'jotai';
 import { filesFamily } from '@librechat/chat/react';
 import { renderHook, act } from '@testing-library/react';
-import type { MouseEvent } from 'react';
+import type { MouseEvent, ReactNode } from 'react';
 import type { ExtendedFile } from '~/common';
 import type { FilesDraft } from '~/utils';
+import { SchoolNavigationContext } from '~/components/School/context';
 
 const mockNewConversation = jest.fn();
 const mockClearMessagesCache = jest.fn();
@@ -251,6 +253,25 @@ const clickEvent = (overrides: Partial<MouseEvent<HTMLElement>> = {}) =>
   }) as unknown as MouseEvent<HTMLElement>;
 
 describe('useNewChat', () => {
+  it('opens the school destination picker without discarding the outgoing draft', () => {
+    const openNewChat = jest.fn();
+    const onNewChat = jest.fn();
+    const { result } = renderHook(() => useNewChat({ onNewChat }), {
+      wrapper: ({ children }: { children: ReactNode }) =>
+        createElement(
+          SchoolNavigationContext.Provider,
+          { value: { openNewChat, href: '/school/new' } },
+          children,
+        ),
+    });
+    act(() => result.current.startNewChat());
+    expect(openNewChat).toHaveBeenCalledTimes(1);
+    expect(onNewChat).toHaveBeenCalledTimes(1);
+    expect(result.current.newChatHref).toBe('/school/new');
+    expect(mockNewConversation).not.toHaveBeenCalled();
+    expect(mockClearAllDrafts).not.toHaveBeenCalled();
+  });
+
   beforeEach(() => {
     jest.clearAllMocks();
     mockDeleteFiles.mockResolvedValue(undefined);

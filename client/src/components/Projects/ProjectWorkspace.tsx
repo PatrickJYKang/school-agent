@@ -38,6 +38,7 @@ import { useElementSize, useLocalize, useNewConvo } from '~/hooks';
 import useDocumentDirection from '~/hooks/useDocumentDirection';
 import OpenSidebar from '~/components/Chat/Menus/OpenSidebar';
 import useDrawerViewport from '~/hooks/Nav/useDrawerViewport';
+import SchoolProject from '~/components/School/Project';
 import ProjectDeleteDialog from './ProjectDeleteDialog';
 import ProjectResources from './ProjectResources';
 import ProjectChatList from './ProjectChatList';
@@ -292,6 +293,7 @@ export default function ProjectWorkspace() {
         tabIndex={project.instructions?.trim() ? 0 : undefined}
         className="focus-visible:ring-text-primary min-h-0 flex-1 overflow-y-auto rounded-md focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-inset"
       >
+        <SchoolProject project={project} />
         {project.instructions?.trim() ? (
           <p className="text-text-secondary text-base leading-relaxed wrap-anywhere whitespace-pre-wrap">
             {project.instructions}
@@ -300,7 +302,7 @@ export default function ProjectWorkspace() {
           <EmptyState
             icon={NotebookPen}
             description={localize('com_ui_project_no_instructions')}
-            className="h-full"
+            className={project.school ? undefined : 'h-full'}
           />
         )}
       </div>

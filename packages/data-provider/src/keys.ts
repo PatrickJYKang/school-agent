@@ -1,5 +1,8 @@
 export enum QueryKeys {
   school = 'school',
+  schoolWorkspace = 'schoolWorkspace',
+  schoolViewers = 'schoolViewers',
+  schoolLiveView = 'schoolLiveView',
   schoolBrowser = 'schoolBrowser',
   canvasCourses = 'canvasCourses',
   canvasMaterials = 'canvasMaterials',
@@ -141,6 +144,11 @@ export const DynamicQueryKeys = {
 } as const;
 
 export enum MutationKeys {
+  schoolFolderChoice = 'schoolFolderChoice',
+  schoolProject = 'schoolProject',
+  schoolSource = 'schoolSource',
+  schoolChat = 'schoolChat',
+  schoolViewer = 'schoolViewer',
   controlSchoolBrowser = 'controlSchoolBrowser',
   connectSchoolCanvas = 'connectSchoolCanvas',
   disconnectSchoolCanvas = 'disconnectSchoolCanvas',

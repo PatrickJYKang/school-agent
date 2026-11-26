@@ -1,6 +1,8 @@
+import type { SchoolProjectData } from 'librechat-data-provider';
 import type { Document, Types } from 'mongoose';
 
 export interface IChatProject {
+  school?: SchoolProjectData;
   _id?: Types.ObjectId;
   name: string;
   description?: string;

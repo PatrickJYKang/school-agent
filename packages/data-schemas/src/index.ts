@@ -5,6 +5,7 @@ export * from './crypto';
 export * from './schema';
 export * from './utils';
 export { createModels } from './models';
+export type { SchoolMethods, SchoolOwner } from './methods/school';
 export {
   createMethods,
   createSkillDeletionPersistenceAdapter,

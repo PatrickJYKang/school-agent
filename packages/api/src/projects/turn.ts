@@ -77,6 +77,19 @@ export function assertChatProjectInstructions({
   if (!context?.instructions.trim()) {
     return;
   }
+  if (context.schoolSources?.length) {
+    assertModelBoundContent({
+      filters,
+      storedMessages: context.schoolSources.map((source) => ({
+        text: source.markdown,
+        isCreatedByUser: true,
+      })),
+      files: context.schoolSources.map((source) => ({
+        filename: source.title,
+        extractedText: source.markdown,
+      })),
+    });
+  }
   assertModelBoundContent({ filters, agents: [{ instructions: context.instructions }] });
 }
 

@@ -261,6 +261,7 @@ export interface ISubagentThreadReservation {
 
 // @ts-ignore
 export interface IConversation extends Document {
+  schoolViewers?: string[];
   conversationId: string;
   title?: string;
   titleSetByUser?: boolean;

@@ -23,7 +23,7 @@ function NewChat({
 }) {
   const localize = useLocalize();
   const { setActive } = useActivePanel();
-  const { startNewChat } = useNewChat();
+  const { startNewChat, newChatHref } = useNewChat();
 
   /**
    * Close first, reset second, the inverse of `useNewChat`'s own click
@@ -60,7 +60,7 @@ function NewChat({
       render={
         <Button asChild variant="ghost" size="icon" className="h-9 w-9 shrink-0">
           <a
-            href="/c/new"
+            href={newChatHref ?? '/c/new'}
             data-testid="nav-new-chat-fab"
             aria-label={localize('com_ui_new_chat')}
             aria-keyshortcuts={newChatAriaKey}

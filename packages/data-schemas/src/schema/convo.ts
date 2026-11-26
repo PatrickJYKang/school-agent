@@ -31,6 +31,7 @@ const convoSchema: Schema<IConversation> = new Schema(
       meiliIndex: true,
     },
     titleSetByUser: { type: Boolean },
+    schoolViewers: { type: [String], default: undefined, select: false },
     titleRevision: { type: Number },
     user: {
       type: String,

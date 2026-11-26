@@ -28,6 +28,7 @@ import ProjectsSection from '~/components/Conversations/ProjectsSection';
 import ChatFilterMenu from '~/components/Conversations/ChatFilterMenu';
 import PinnedSection from '~/components/Conversations/PinnedSection';
 import ProjectNamesProvider from '~/Providers/ProjectNamesContext';
+import { SchoolHomeLink } from '~/components/School/Navigation';
 import useDrawerViewport from '~/hooks/Nav/useDrawerViewport';
 import useSidebarToggle from '~/hooks/Nav/useSidebarToggle';
 import { Conversations } from '~/components/Conversations';
@@ -241,7 +242,10 @@ const ConversationsSection = memo(() => {
             list still claims the space below them when there is little to show. */}
             <div ref={setScrollContent} className="flex min-h-full flex-col">
               {!search.query && (
-                <ProjectsSection toggleNav={toggleNav} isAuthenticated={isAuthenticated} />
+                <>
+                  <SchoolHomeLink />
+                  <ProjectsSection toggleNav={toggleNav} isAuthenticated={isAuthenticated} />
+                </>
               )}
               {!search.query && (
                 <PinnedSection

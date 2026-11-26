@@ -138,3 +138,26 @@ environment variables. Reports stay in the ignored `.lighthouse/` directory. Thi
 check does not validate real model inference or school integrations. The full
 monorepo test suite has not been run; focused school checks are recorded separately
 in [`school.md`](school.md).
+
+## November 25 workspace verification
+
+The school dashboard, destination picker, project assignment context and named
+text-only viewers are enabled locally. See [status and limits](dashboard.md).
+The real Canvas connection returned upcoming work in the browser. Verification
+left the course-folder prompt unanswered and granted nobody access. Temporary
+chats and their project were removed through the owner-only app routes afterward.
+
+The browser check confirmed project membership, native automatic chat naming,
+visible copied reference text, continued model use of a synthetic reference, the
+viewer controls and the read-only saved-message view. No actual school document
+was submitted to the model for these checks. Focused API, storage and screen
+checks cover consent, concurrent imports, older project records, shared context,
+retention, current content rules, tenant isolation, revocation and account cleanup.
+The changed workspaces were typechecked separately from their builds.
+
+The isolated production-build startup lane passed its three-run median budgets
+with 250 ms added per Mongo query: LCP **4,154.1 ms** (limit 4,500), CLS **0.0175**
+(limit 0.1), and TBT **87.9 ms** (limit 500). The initial attempt hit the test
+server's 120-second startup timeout while other checks ran. The later standalone
+run passed, although one of its page audits had 10.2-second LCP; local timing is
+variable and this is a median regression gate, not a field-performance guarantee.
